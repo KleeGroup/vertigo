@@ -8,7 +8,7 @@
 	<packaging>pom</packaging>
 	<name>vertigo-parent</name>
 	<description>Vertigo is a simple java project starter</description>
-	<url>https://github.com/KleeGroup/vertigo</url>
+	<url>https://github.com/vertigo-io/vertigo</url>
 
 	<licenses>
 		<license>
@@ -37,10 +37,10 @@
 	</developers>
 	
 	<scm>
-		<connection>scm:git:https://github.com/KleeGroup/vertigo.git</connection>
-		<developerConnection>scm:git:https://github.com/KleeGroup/vertigo.git</developerConnection>
-		<url>scm:git:https://github.com/KleeGroup/vertigo.git</url>
-		<tag>vertigo-2.0.0-SNAPSHOT</tag>
+		<connection>scm:git:https://github.com/vertigo-io/vertigo.git</connection>
+		<developerConnection>scm:git:https://github.com/vertigo-io/vertigo.git</developerConnection>
+		<url>scm:git:https://github.com/vertigo-io/vertigo.git</url>
+		<tag>vertigo-2.0.0</tag>
 	</scm>
 
 	<distributionManagement>
