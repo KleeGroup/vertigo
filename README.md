@@ -1,6 +1,8 @@
 # Vertigo
 =================
 
+[![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
+
 A Simple Java Starter kit for **real projects**.
 
 Its main purpose is to publish simple and homogeneous APIs over more complex libraries.
