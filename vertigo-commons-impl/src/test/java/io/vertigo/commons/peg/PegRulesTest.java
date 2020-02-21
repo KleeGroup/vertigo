@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -91,5 +91,14 @@ public class PegRulesTest {
 	@Test
 	public void skipBlanks() throws PegNoMatchFoundException {
 		Assertions.assertEquals(10, skipBlanks.parse("+++****+++", 0).getIndex());
+	}
+
+	@Test
+	public void asHtml() {
+		Assertions.assertNotEquals("", new PegRulesHtmlRenderer().render(choice));
+		Assertions.assertNotEquals("", new PegRulesHtmlRenderer().render(sequence));
+		Assertions.assertNotEquals("", new PegRulesHtmlRenderer().render(oneOrMore));
+		Assertions.assertNotEquals("", new PegRulesHtmlRenderer().render(zeroOrMore));
+		Assertions.assertNotEquals("", new PegRulesHtmlRenderer().render(skipBlanks));
 	}
 }

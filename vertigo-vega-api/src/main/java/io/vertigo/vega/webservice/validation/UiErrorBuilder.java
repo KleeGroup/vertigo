@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,8 +18,8 @@
  */
 package io.vertigo.vega.webservice.validation;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -129,7 +129,7 @@ public final class UiErrorBuilder {
 		final Object value1 = getValue(dto, dtField1);
 		final Object value2 = getValue(dto, dtField2);
 		//value1 et value2 == null ou value1 equals value2, sinon error
-		if (value1 != null && !value1.equals(value2) || value2 != null) {
+		if (value1 != null && !value1.equals(value2) || value1 == null && value2 != null) {
 			addError(dto, dtField2, messageText);
 		}
 	}
@@ -144,9 +144,9 @@ public final class UiErrorBuilder {
 	public void checkFieldDateAfter(final DtObject dto, final String fieldName1, final String fieldName2, final MessageText messageText) {
 		final DtField dtField1 = getDtField(dto, fieldName1);
 		final DtField dtField2 = getDtField(dto, fieldName2);
-		final Date value1 = (Date) getValue(dto, dtField1); //la valeur typée peut être null
-		final Date value2 = (Date) getValue(dto, dtField2);
-		if (value1 != null && value2 != null && !value2.after(value1)) {
+		final LocalDate value1 = (LocalDate) getValue(dto, dtField1); //la valeur typée peut être null
+		final LocalDate value2 = (LocalDate) getValue(dto, dtField2);
+		if (value1 != null && value2 != null && !value2.isAfter(value1)) {
 			addError(dto, dtField2, messageText);
 		}
 	}

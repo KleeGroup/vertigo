@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -263,7 +263,13 @@ public final class YamlAppConfigBuilder implements Builder<NodeConfig> {
 			return true;// no flags declared means always
 		}
 		return flags.stream()
-				.anyMatch(flag -> activeFlags.contains(flag));
+				.anyMatch(flag -> {
+					Assertion.checkArgNotEmpty(flag, "A flag cannot be empty");
+					if (flag.charAt(0) == '!') {
+						return !activeFlags.contains(flag.substring(1));
+					}
+					return activeFlags.contains(flag);
+				});
 	}
 
 	private static Object[] findmethodParameters(final Map<String, Object> paramsConfig, final Method method, final String featureName, final String featuresClassName) {

@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,10 +31,31 @@ import io.vertigo.dynamox.domain.formatter.FormatterString;
  * @author pchretien
  */
 public class StringFormatterTest {
-	private final Formatter formatterString = new FormatterString("UPPER");
 
 	@Test
 	public void testUpper() {
+		final Formatter formatterString = new FormatterString("UPPER");
 		Assertions.assertEquals("AA", formatterString.valueToString("aa", DataType.String));
+		Assertions.assertEquals("AA", formatterString.valueToString("AA", DataType.String));
+		Assertions.assertEquals("AA", formatterString.valueToString("Aa", DataType.String));
+		Assertions.assertEquals("AA", formatterString.valueToString("aA", DataType.String));
+	}
+
+	@Test
+	public void testLower() {
+		final Formatter formatterString = new FormatterString("LOWER");
+		Assertions.assertEquals("aa", formatterString.valueToString("aa", DataType.String));
+		Assertions.assertEquals("aa", formatterString.valueToString("AA", DataType.String));
+		Assertions.assertEquals("aa", formatterString.valueToString("Aa", DataType.String));
+		Assertions.assertEquals("aa", formatterString.valueToString("aA", DataType.String));
+	}
+
+	@Test
+	public void testUpperFirst() {
+		final Formatter formatterString = new FormatterString("UPPER_FIRST");
+		Assertions.assertEquals("Aa", formatterString.valueToString("aa", DataType.String));
+		Assertions.assertEquals("Aa", formatterString.valueToString("AA", DataType.String));
+		Assertions.assertEquals("Aa", formatterString.valueToString("Aa", DataType.String));
+		Assertions.assertEquals("Aa", formatterString.valueToString("aA", DataType.String));
 	}
 }

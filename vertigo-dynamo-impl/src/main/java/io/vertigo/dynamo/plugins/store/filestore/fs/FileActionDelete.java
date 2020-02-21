@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,9 +16,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**
- *
- */
 package io.vertigo.dynamo.plugins.store.filestore.fs;
 
 import java.io.File;
@@ -31,7 +28,7 @@ import io.vertigo.lang.Assertion;
 import io.vertigo.lang.VSystemException;
 
 /**
- * Classe de gestion de la sauvegarde d'un fichier.
+ * Handling removal of a file.
  *
  * @author skerdudou
  */
@@ -43,7 +40,7 @@ final class FileActionDelete implements VTransactionAfterCompletionFunction {
 	/**
 	 * Constructor.
 	 *
-	 * @param path le chemin de destination du fichier
+	 * @param path Location of the file
 	 */
 	FileActionDelete(final String path) {
 		Assertion.checkNotNull(path);

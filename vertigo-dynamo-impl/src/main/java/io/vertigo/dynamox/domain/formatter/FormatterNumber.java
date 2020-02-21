@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -140,7 +140,8 @@ public class FormatterNumber implements Formatter {
 			throw new IllegalArgumentException("Type unsupported : " + dataType);
 		} catch (final NumberFormatException e) {
 			// cas des erreurs sur les formats de nombre
-			throw new FormatterException(Resources.DYNAMOX_NUMBER_NOT_FORMATTED, e);
+			throw (FormatterException) new FormatterException(Resources.DYNAMOX_NUMBER_NOT_FORMATTED)
+					.initCause(e);
 		}
 
 	}
@@ -153,9 +154,8 @@ public class FormatterNumber implements Formatter {
 			return Integer.valueOf(sValue);
 		} catch (final NumberFormatException e) {
 			// C'est un entier trop grand
-			final FormatterException formatterException = new FormatterException(Resources.DYNAMOX_NUMBER_TOO_BIG);
-			formatterException.initCause(e);
-			throw formatterException;
+			throw (FormatterException) new FormatterException(Resources.DYNAMOX_NUMBER_TOO_BIG)
+					.initCause(e);
 		}
 	}
 

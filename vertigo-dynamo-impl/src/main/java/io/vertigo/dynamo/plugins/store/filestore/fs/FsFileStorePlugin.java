@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,9 +22,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -203,7 +203,7 @@ public final class FsFileStorePlugin implements FileStorePlugin, Activeable {
 		try (InputStream inputStream = fileInfo.getVFile().createInputStream()) {
 			getCurrentTransaction().addAfterCompletion(new FileActionSave(inputStream, documentRoot + pathToSave));
 		} catch (final IOException e) {
-			throw WrappedException.wrap(e, "Impossible de lire le fichier uploadé.");
+			throw WrappedException.wrap(e, "Can't read uploaded file.");
 		}
 	}
 
@@ -224,8 +224,8 @@ public final class FsFileStorePlugin implements FileStorePlugin, Activeable {
 		fileInfo.setURIStored(uri);
 
 		// on met a jour la base
-		final SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd/", Locale.FRANCE);
-		final String pathToSave = format.format(new Date()) + fileInfoDtoId;
+		final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy/MM/dd/", Locale.FRANCE);
+		final String pathToSave = format.format(LocalDate.now()) + fileInfoDtoId;
 		setValue(fileInfoDto, DtoFields.filePath, pathToSave);
 		//-----
 		getStoreManager().getDataStore().update(fileInfoDto);
@@ -274,7 +274,7 @@ public final class FsFileStorePlugin implements FileStorePlugin, Activeable {
 	 * @return URI du DTO utilisé en BDD pour stocker.
 	 */
 	private UID<Entity> createDtObjectURI(final FileInfoURI uri) {
-		Assertion.checkNotNull(uri, "uri du fichier doit être renseignée.");
+		Assertion.checkNotNull(uri, "file uri must be provided.");
 		//-----
 		// Il doit exister un DtObjet associé, avec la structure attendue.
 		return UID.of(storeDtDefinition, uri.getKeyAs(storeIdField.getDomain().getDataType()));
@@ -287,7 +287,7 @@ public final class FsFileStorePlugin implements FileStorePlugin, Activeable {
 	 * @return DTO utilisé en BDD pour stocker.
 	 */
 	private Entity createFileInfoEntity(final FileInfoDefinition fileInfoDefinition) {
-		Assertion.checkNotNull(fileInfoDefinition, "fileInfoDefinition du fichier doit être renseignée.");
+		Assertion.checkNotNull(fileInfoDefinition, "fileInfoDefinition must be provided.");
 		//-----
 		// Il doit exister un DtObjet associé, avec la structure attendue.
 		return DtObjectUtil.createEntity(storeDtDefinition);

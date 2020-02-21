@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -330,6 +330,24 @@ public final class SimplerTestWebServices implements WebServices {
 		return result;
 	}
 
+	@GET("/dtList10/{id}")
+	public DtList<Contact> loadListDigitInRoute(@PathParam("id") final long conId) {
+		final DtList<Contact> result = new DtList<>(Contact.class);
+		for (final Contact contact : contactDao.getList()) {
+			result.add(contact);
+		}
+		return (DtList<Contact>) result.subList(0, 10);
+	}
+
+	@GET("/dtList10elts/{id}")
+	public DtList<Contact> loadListDigitInRoute2(@PathParam("id") final long conId) {
+		final DtList<Contact> result = new DtList<>(Contact.class);
+		for (final Contact contact : contactDao.getList()) {
+			result.add(contact);
+		}
+		return (DtList<Contact>) result.subList(0, 10);
+	}
+
 	@GET("/dtListMetaAsList")
 	public List<Contact> loadListMetaAsList() {
 		return loadListMeta();
@@ -428,7 +446,12 @@ public final class SimplerTestWebServices implements WebServices {
 		return bodyString;
 	}
 
-	@POST("/contact/secured")
+	@POST("/string/optionalInnerBodyParam")
+	public String testOptionalInnerBodyParam(final Contact contact, @InnerBodyParam("token") final Optional<String> token) {
+		return token.orElse("empty");
+	}
+
+	@POST("/string/optionalQueryParam")
 	public String testOptionalQueryParam(final Contact contact, @QueryParam("token") final Optional<String> token) {
 		return token.orElse("empty");
 	}

@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -56,7 +56,7 @@ public final class SocketLoggerAnalyticsConnectorPlugin implements AnalyticsConn
 	private static final Gson GSON = new GsonBuilder().create();
 	private static final int DEFAULT_SERVER_PORT = 4562;// DefaultPort of SocketAppender 4650 for log4j and 4562 for log4j2
 
-	private Logger socketLogger;
+	private Logger socketProcessLogger;
 	private Logger socketHealthLogger;
 	private Logger socketMetricLogger;
 	private final String hostName;
@@ -100,7 +100,7 @@ public final class SocketLoggerAnalyticsConnectorPlugin implements AnalyticsConn
 	@Override
 	public void add(final Metric metric) {
 		if (socketMetricLogger == null) {
-			socketMetricLogger = createLogger("analytics-metric", hostName, port);
+			socketMetricLogger = createLogger("vertigo-analytics-metric", hostName, port);
 		}
 		sendObject(metric, socketMetricLogger);
 
@@ -110,7 +110,7 @@ public final class SocketLoggerAnalyticsConnectorPlugin implements AnalyticsConn
 	@Override
 	public void add(final HealthCheck healthCheck) {
 		if (socketHealthLogger == null) {
-			socketHealthLogger = createLogger("analytics-health", hostName, port);
+			socketHealthLogger = createLogger("vertigo-analytics-health", hostName, port);
 		}
 		sendObject(healthCheck, socketHealthLogger);
 
@@ -163,10 +163,10 @@ public final class SocketLoggerAnalyticsConnectorPlugin implements AnalyticsConn
 	}
 
 	private void sendProcess(final AProcess process) {
-		if (socketLogger == null) {
-			socketLogger = createLogger(SocketLoggerAnalyticsConnectorPlugin.class.getName(), hostName, port);
+		if (socketProcessLogger == null) {
+			socketProcessLogger = createLogger("vertigo-analytics-process", hostName, port);
 		}
-		sendObject(process, socketLogger);
+		sendObject(process, socketProcessLogger);
 	}
 
 	private void sendObject(final Object object, final Logger logger) {

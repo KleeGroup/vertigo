@@ -1,0 +1,10 @@
+---
+boot:
+  params:
+    locales: fr_FR, en_US
+  plugins:
+    - io.vertigo.core.plugins.resource.classpath.ClassPathResourceResolverPlugin: {}
+modules:
+  io.vertigo.commons.CommonsFeatures:
+    features:
+    featuresConfig:  

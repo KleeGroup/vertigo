@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,9 +23,9 @@ import java.util.Iterator;
 
 import io.vertigo.account.AccountFeatures;
 import io.vertigo.account.plugins.authorization.loaders.JsonSecurityDefinitionProvider;
-import io.vertigo.app.config.NodeConfig;
 import io.vertigo.app.config.DefinitionProviderConfig;
 import io.vertigo.app.config.ModuleConfig;
+import io.vertigo.app.config.NodeConfig;
 import io.vertigo.commons.CommonsFeatures;
 import io.vertigo.commons.plugins.app.infos.http.HttpAppNodeInfosPlugin;
 import io.vertigo.commons.plugins.cache.memory.MemoryCachePlugin;
@@ -51,6 +51,7 @@ import io.vertigo.vega.webservice.data.ws.FileDownloadWebServices;
 import io.vertigo.vega.webservice.data.ws.LoginSecuredWebServices;
 import io.vertigo.vega.webservice.data.ws.SearchTestWebServices;
 import io.vertigo.vega.webservice.data.ws.SimplerTestWebServices;
+import io.vertigo.vega.webservice.data.ws.ValidationsTestWebServices;
 
 public final class MyNodeConfig {
 	public static final int WS_PORT = 8088;
@@ -65,7 +66,17 @@ public final class MyNodeConfig {
 		}
 	}
 
-	public static NodeConfig config() {
+	public static NodeConfig config(final boolean isEmbedded) {
+
+		final VegaFeatures vegaFeatures = new VegaFeatures()
+				.withWebServices()
+				.withWebServicesTokens(Param.of("tokens", "tokens"))
+				.withWebServicesSecurity()
+				.withWebServicesRateLimiting();
+		if (isEmbedded) {
+			vegaFeatures.withWebServicesEmbeddedServer(Param.of("port", Integer.toString(WS_PORT)));
+		}
+
 		return NodeConfig.builder()
 				.withEndPoint("http://localhost:" + WS_PORT)
 				.beginBoot()
@@ -88,13 +99,7 @@ public final class MyNodeConfig {
 						.withSecurity(Param.of("userSessionClassName", TestUserSession.class.getName()))
 						.withAuthorization()
 						.build())
-				.addModule(new VegaFeatures()
-						.withWebServices()
-						.withWebServicesTokens(Param.of("tokens", "tokens"))
-						.withWebServicesSecurity()
-						.withWebServicesRateLimiting()
-						.withWebServicesEmbeddedServer(Param.of("port", Integer.toString(WS_PORT)))
-						.build())
+				.addModule(vegaFeatures.build())
 				//-----
 				.addModule(ModuleConfig.builder("dao-app")
 						.addComponent(ContactDao.class)
@@ -106,6 +111,7 @@ public final class MyNodeConfig {
 						.addComponent(ContactsSecuredWebServices.class)
 						.addComponent(LoginSecuredWebServices.class)
 						.addComponent(SimplerTestWebServices.class)
+						.addComponent(ValidationsTestWebServices.class)
 						.addComponent(AdvancedTestWebServices.class)
 						.addComponent(AnonymousTestWebServices.class)
 						.addComponent(FileDownloadWebServices.class)

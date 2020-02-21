@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,9 +18,6 @@
  */
 package io.vertigo.database.sql.vendor.h2;
 
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
-
 import io.vertigo.app.config.NodeConfig;
 import io.vertigo.commons.CommonsFeatures;
 import io.vertigo.core.param.Param;
@@ -31,7 +28,6 @@ import io.vertigo.database.sql.mapper.MailAdapterSupplierPlugin;
 import io.vertigo.database.sql.vendor.SqlDialect;
 import io.vertigo.database.sql.vendor.SqlDialect.GenerationMode;
 
-@RunWith(JUnitPlatform.class)
 public final class H2DataBaseManagerTest extends AbstractSqlDataBaseManagerTest {
 
 	@Override
@@ -86,7 +82,7 @@ public final class H2DataBaseManagerTest extends AbstractSqlDataBaseManagerTest 
 
 	@Override
 	protected GenerationMode getExpectedGenerationMode() {
-		return GenerationMode.GENERATED_KEYS;
+		return GenerationMode.GENERATED_COLUMNS;
 	}
 
 	@Override

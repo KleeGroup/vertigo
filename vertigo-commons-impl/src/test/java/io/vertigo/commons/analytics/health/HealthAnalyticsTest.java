@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,14 +23,12 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 
 import io.vertigo.AbstractTestCaseJU5;
-import io.vertigo.app.config.NodeConfig;
 import io.vertigo.app.config.ModuleConfig;
+import io.vertigo.app.config.NodeConfig;
 import io.vertigo.commons.CommonsFeatures;
 import io.vertigo.commons.analytics.AnalyticsManager;
 import io.vertigo.commons.analytics.health.data.FailedComponentChecker;
@@ -40,7 +38,6 @@ import io.vertigo.core.param.Param;
 import io.vertigo.lang.Assertion;
 import io.vertigo.lang.VSystemException;
 
-@RunWith(JUnitPlatform.class)
 public class HealthAnalyticsTest extends AbstractTestCaseJU5 {
 
 	@Inject
@@ -73,8 +70,8 @@ public class HealthAnalyticsTest extends AbstractTestCaseJU5 {
 				.filter(healthCheck -> "redisChecker".equals(healthCheck.getFeature()))
 				.collect(Collectors.toList());
 		//---
-		Assert.assertEquals(1, redisHealthChecks.size());
-		Assert.assertEquals(HealthStatus.GREEN, redisHealthChecks.get(0).getMeasure().getStatus());
+		Assertions.assertEquals(1, redisHealthChecks.size());
+		Assertions.assertEquals(HealthStatus.GREEN, redisHealthChecks.get(0).getMeasure().getStatus());
 
 	}
 
@@ -82,17 +79,17 @@ public class HealthAnalyticsTest extends AbstractTestCaseJU5 {
 	void testFailComponent() {
 		final List<HealthCheck> failedHealthChecks = findHealthChecksByName("failure");
 		//---
-		Assert.assertEquals(1, failedHealthChecks.size());
-		Assert.assertEquals(HealthStatus.RED, failedHealthChecks.get(0).getMeasure().getStatus());
-		Assert.assertTrue(failedHealthChecks.get(0).getMeasure().getCause() instanceof VSystemException);
+		Assertions.assertEquals(1, failedHealthChecks.size());
+		Assertions.assertEquals(HealthStatus.RED, failedHealthChecks.get(0).getMeasure().getStatus());
+		Assertions.assertTrue(failedHealthChecks.get(0).getMeasure().getCause() instanceof VSystemException);
 	}
 
 	@Test
 	void testSuccessComponent() {
 		final List<HealthCheck> successHealthChecks = findHealthChecksByName("success");
 		//---
-		Assert.assertEquals(1, successHealthChecks.size());
-		Assert.assertEquals(HealthStatus.GREEN, successHealthChecks.get(0).getMeasure().getStatus());
+		Assertions.assertEquals(1, successHealthChecks.size());
+		Assertions.assertEquals(HealthStatus.GREEN, successHealthChecks.get(0).getMeasure().getStatus());
 	}
 
 	@Test
@@ -100,8 +97,8 @@ public class HealthAnalyticsTest extends AbstractTestCaseJU5 {
 		final List<HealthCheck> successHealthChecks = findHealthChecksByName("success");
 		final List<HealthCheck> failedHealthChecks = findHealthChecksByName("failure");
 		//---
-		Assert.assertEquals(HealthStatus.GREEN, analyticsManager.aggregate(successHealthChecks));
-		Assert.assertEquals(HealthStatus.RED, analyticsManager.aggregate(failedHealthChecks));
+		Assertions.assertEquals(HealthStatus.GREEN, analyticsManager.aggregate(successHealthChecks));
+		Assertions.assertEquals(HealthStatus.RED, analyticsManager.aggregate(failedHealthChecks));
 
 	}
 

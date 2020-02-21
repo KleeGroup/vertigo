@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -65,7 +65,7 @@ public final class OOMLoader extends AbstractXmlLoader {
 		return map.values().stream()
 				//On ne conserve que les classes et les domaines
 				.filter(obj -> obj.getType() == OOMType.Class)
-				.map(this::createClass)
+				.map(obj -> createClass(obj, isConstFieldNameInSource()))
 				.collect(Collectors.toList());
 	}
 
@@ -73,13 +73,13 @@ public final class OOMLoader extends AbstractXmlLoader {
 	public List<XmlAssociation> getAssociations() {
 		return map.values().stream()
 				.filter(obj -> obj.getType() == OOMType.Association)
-				.map(this::createAssociation)
+				.map(obj -> createAssociation(obj, isConstFieldNameInSource()))
 				.collect(Collectors.toList());
 	}
 
-	private XmlClass createClass(final OOMObject obj) {
+	private XmlClass createClass(final OOMObject obj, final boolean constFieldNameInSource) {
 		//On recherche les attributs (>DtField) de cet classe(>Dt_DEFINITION)
-		final String code = obj.getCode();
+		final String code = constFieldNameInSource ? StringUtil.constToUpperCamelCase(obj.getCode().toUpperCase(Locale.ENGLISH)) : obj.getCode();
 		final String packageName = obj.getParent().getPackageName();
 		final String stereotype = obj.getStereotype();
 		//On recherche les PrimaryIdentifiers :
@@ -100,20 +100,20 @@ public final class OOMLoader extends AbstractXmlLoader {
 		for (final OOMObject child : obj.getChildren()) {
 			if (child.getType() == OOMType.Attribute) {
 				if (pkList.contains(child.getId())) {
-					final XmlAttribute attributeOOm = createAttribute(child, true);
+					final XmlAttribute attributeOOm = createAttribute(child, true, constFieldNameInSource);
 					keyAttributes.add(attributeOOm);
 				} else {
-					fieldAttributes.add(createAttribute(child, false));
+					fieldAttributes.add(createAttribute(child, false, constFieldNameInSource));
 				}
 			}
 		}
 		return new XmlClass(code, packageName, stereotype, keyAttributes, fieldAttributes);
 	}
 
-	private XmlAttribute createAttribute(final OOMObject obj, final boolean isPK) {
+	private XmlAttribute createAttribute(final OOMObject obj, final boolean isPK, final boolean constFieldNameInSource) {
 		final String code = obj.getCode();
 		Assertion.checkArgument(CODE_PATTERN.matcher(code).matches(), "Code {0} must use a simple charset a-z A-Z 0-9 or _", code);
-		final String fieldName = isConstFieldNameInSource() ? StringUtil.constToLowerCamelCase(code.toUpperCase(Locale.ENGLISH)) : code;
+		final String fieldName = constFieldNameInSource ? StringUtil.constToLowerCamelCase(code.toUpperCase(Locale.ENGLISH)) : code;
 		final String label = obj.getLabel();
 		final boolean persistent = !"0".equals(obj.getPersistent());
 
@@ -135,7 +135,7 @@ public final class OOMLoader extends AbstractXmlLoader {
 			}
 		}
 		Assertion.checkNotNull(domain);
-		final String domainName = isConstFieldNameInSource() ? StringUtil.constToUpperCamelCase(domain.toUpperCase(Locale.ENGLISH)) : domain;
+		final String domainName = constFieldNameInSource ? StringUtil.constToUpperCamelCase(domain.toUpperCase(Locale.ENGLISH)) : domain;
 		return new XmlAttribute(fieldName, label, persistent, notNull, domainName);
 	}
 
@@ -144,7 +144,7 @@ public final class OOMLoader extends AbstractXmlLoader {
 	 * @param obj ObjectOOM
 	 * @return Association
 	 */
-	private XmlAssociation createAssociation(final OOMObject obj) {
+	private XmlAssociation createAssociation(final OOMObject obj, final boolean constFieldNameInSource) {
 		//On recherche les objets référencés par l'association.
 		OOMObject objectB = null;
 		OOMObject objectA = null;
@@ -165,21 +165,23 @@ public final class OOMLoader extends AbstractXmlLoader {
 			throw new IllegalArgumentException("Noeuds de l'association introuvables");
 		}
 
-		final String code = obj.getCode();
+		final String code = constFieldNameInSource ? StringUtil.constToUpperCamelCase(obj.getCode().toUpperCase(Locale.ENGLISH)) : obj.getCode();
 		final String packageName = obj.getParent().getPackageName();
 
 		final String multiplicityA = obj.getRoleAMultiplicity();
 		final String multiplicityB = obj.getRoleBMultiplicity();
 
 		//Si les roles ne sont pas renseignés ont prend le nom de la table en CamelCase.
-		final String roleLabelA = obj.getRoleALabel() != null ? obj.getRoleALabel() : StringUtil.constToUpperCamelCase(objectA.getName());
-		final String roleLabelB = obj.getRoleBLabel() != null ? obj.getRoleBLabel() : StringUtil.constToUpperCamelCase(objectB.getName());
+		final String computedRoleA = constFieldNameInSource ? StringUtil.constToUpperCamelCase(objectA.getName()) : objectA.getName();
+		final String computedRoleB = constFieldNameInSource ? StringUtil.constToUpperCamelCase(objectB.getName()) : objectB.getName();
+		final String roleLabelA = obj.getRoleALabel() != null ? obj.getRoleALabel() : computedRoleA;
+		final String roleLabelB = obj.getRoleBLabel() != null ? obj.getRoleBLabel() : computedRoleB;
 		// Si il n'existe pas de libelle pour un role donné alors on utilise le nom de l'objet référencé.
 		//Le code du role est déduit du libellé.
 
 		//Attention pamc inverse dans oom les déclarations des objets !!
-		final String codeA = objectA.getCode();
-		final String codeB = objectB.getCode();
+		final String codeA = constFieldNameInSource ? StringUtil.constToUpperCamelCase(objectA.getCode().toUpperCase(Locale.ENGLISH)) : objectA.getCode();
+		final String codeB = constFieldNameInSource ? StringUtil.constToUpperCamelCase(objectB.getCode().toUpperCase(Locale.ENGLISH)) : objectB.getCode();
 
 		// associationDefinition.
 		//On recherche les attributs (>DtField) de cet classe(>Dt_DEFINITION)
@@ -194,4 +196,5 @@ public final class OOMLoader extends AbstractXmlLoader {
 	public String getType() {
 		return "oom";
 	}
+
 }

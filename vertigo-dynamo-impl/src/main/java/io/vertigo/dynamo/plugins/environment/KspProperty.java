@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -77,6 +77,11 @@ public final class KspProperty {
 	 * Champ qui porte l'affichage par défaut. (Un au plus par DT)
 	 */
 	public static final String DISPLAY_FIELD = "DISPLAY_FIELD";
+
+	/**
+	 * Champ qui sert pour le handle. (Un au plus par DT)
+	 */
+	public static final String HANDLE_FIELD = "HANDLE_FIELD";
 
 	/**
 	 * Le Stereotype appliqué au DT : Data (defaut), MasterData ou KeyConcept

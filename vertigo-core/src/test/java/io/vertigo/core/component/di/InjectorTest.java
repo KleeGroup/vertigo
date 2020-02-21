@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,12 +29,8 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 
 import io.vertigo.core.component.Container;
-import io.vertigo.core.component.di.DIException;
-import io.vertigo.core.component.di.DIInjector;
 import io.vertigo.core.component.di.data.A;
 import io.vertigo.core.component.di.data.B;
 import io.vertigo.core.component.di.data.B2;
@@ -49,7 +45,6 @@ import io.vertigo.lang.Assertion;
  * Voir sur reactor pour l'arbre des dépendances des objets A==>F.
  * @author pchretien
  */
-@RunWith(JUnitPlatform.class)
 public final class InjectorTest {
 	private static class MyContainer implements Container {
 		private final Map<String, Object> map = new HashMap<>();
@@ -192,11 +187,11 @@ public final class InjectorTest {
 		container.put("param2", "test2");
 		container.put("param3", "test3");
 		final F f = DIInjector.newInstance(F.class, container);
-		assertEquals(f.getA(), a);
-		assertEquals(f.getParam1(), "test1");
-		assertEquals(f.getParam2(), "test2");
+		assertEquals(a, f.getA());
+		assertEquals("test1", f.getParam1());
+		assertEquals("test2", f.getParam2());
 		assertTrue(f.getParam3().isPresent());
-		assertEquals(f.getParam3().get(), "test3");
+		assertEquals("test3", f.getParam3().get());
 		assertFalse(f.getParam4().isPresent());
 	}
 }

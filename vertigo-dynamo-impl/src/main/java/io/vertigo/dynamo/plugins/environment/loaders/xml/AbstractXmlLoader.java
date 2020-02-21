@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +21,6 @@ package io.vertigo.dynamo.plugins.environment.loaders.xml;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
-import java.util.Locale;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.SAXParser;
@@ -92,11 +91,11 @@ public abstract class AbstractXmlLoader implements Loader {
 		//-----
 
 		for (final XmlClass clazz : getClasses()) {
-			dslDefinitionRepository.addDefinition(toDynamicDefinition(clazz, constFieldNameInSource));
+			dslDefinitionRepository.addDefinition(toDynamicDefinition(clazz));
 		}
 
 		for (final XmlAssociation association : getAssociations()) {
-			dslDefinitionRepository.addDefinition(toDynamicDefinition(association, dslDefinitionRepository, constFieldNameInSource));
+			dslDefinitionRepository.addDefinition(toDynamicDefinition(association, dslDefinitionRepository));
 		}
 	}
 
@@ -118,9 +117,9 @@ public abstract class AbstractXmlLoader implements Loader {
 		return constFieldNameInSource;
 	}
 
-	private static DslDefinition toDynamicDefinition(final XmlClass clazz, final boolean constFieldNameInSource) {
+	private static DslDefinition toDynamicDefinition(final XmlClass clazz) {
 		final DslEntity dtDefinitionEntity = DomainGrammar.DT_DEFINITION_ENTITY;
-		final DslDefinitionBuilder dtDefinitionBuilder = DslDefinition.builder(getDtDefinitionName(clazz.getCode(), constFieldNameInSource), dtDefinitionEntity)
+		final DslDefinitionBuilder dtDefinitionBuilder = DslDefinition.builder(getDtDefinitionName(clazz.getCode()), dtDefinitionEntity)
 				.withPackageName(clazz.getPackageName())
 				//Par défaut les DT lues depuis le OOM/XMI sont persistantes.
 				.addPropertyValue(KspProperty.STEREOTYPE, clazz.getStereotype());
@@ -147,11 +146,9 @@ public abstract class AbstractXmlLoader implements Loader {
 				.build();
 	}
 
-	private static DslDefinition toDynamicDefinition(final XmlAssociation association, final DslDefinitionRepository dynamicModelrepository, final boolean constFieldNameInSource) {
+	private static DslDefinition toDynamicDefinition(final XmlAssociation association, final DslDefinitionRepository dynamicModelrepository) {
 		final DslEntity associationEntity = DomainGrammar.ASSOCIATION_ENTITY;
 		final DslEntity associationNNEntity = DomainGrammar.ASSOCIATION_NN_ENTITY;
-
-		final String name = constFieldNameInSource ? StringUtil.constToUpperCamelCase(association.getCode()) : association.getCode();
 
 		//On regarde si on est dans le cas d'une association simple ou multiple
 		final boolean isAssociationNN = AssociationUtil.isMultiple(association.getMultiplicityA()) && AssociationUtil.isMultiple(association.getMultiplicityB());
@@ -162,8 +159,10 @@ public abstract class AbstractXmlLoader implements Loader {
 			dynamicMetaDefinition = associationEntity;
 		}
 
+		final String associationDefinitionName = (isAssociationNN ? "Ann" : "A") + association.getCode();
+
 		//On crée l'association
-		final DslDefinitionBuilder associationDefinitionBuilder = DslDefinition.builder(name, dynamicMetaDefinition)
+		final DslDefinitionBuilder associationDefinitionBuilder = DslDefinition.builder(associationDefinitionName, dynamicMetaDefinition)
 				.withPackageName(association.getPackageName())
 				.addPropertyValue(KspProperty.NAVIGABILITY_A, association.isNavigableA())
 				.addPropertyValue(KspProperty.NAVIGABILITY_B, association.isNavigableB())
@@ -174,8 +173,8 @@ public abstract class AbstractXmlLoader implements Loader {
 				.addPropertyValue(KspProperty.LABEL_B, association.getRoleLabelB())
 				.addPropertyValue(KspProperty.ROLE_B, XmlUtil.french2Java(association.getRoleLabelB()))
 				//---
-				.addDefinitionLink("dtDefinitionA", getDtDefinitionName(association.getCodeA(), constFieldNameInSource))
-				.addDefinitionLink("dtDefinitionB", getDtDefinitionName(association.getCodeB(), constFieldNameInSource));
+				.addDefinitionLink("dtDefinitionA", getDtDefinitionName(association.getCodeA()))
+				.addDefinitionLink("dtDefinitionB", getDtDefinitionName(association.getCodeB()));
 
 		if (isAssociationNN) {
 			//Dans le cas d'une association NN il faut établir le nom de la table intermédiaire qui porte les relations
@@ -189,19 +188,19 @@ public abstract class AbstractXmlLoader implements Loader {
 			associationDefinitionBuilder
 					.addPropertyValue(KspProperty.MULTIPLICITY_A, association.getMultiplicityA())
 					.addPropertyValue(KspProperty.MULTIPLICITY_B, association.getMultiplicityB())
-					.addPropertyValue(KspProperty.FK_FIELD_NAME, buildFkFieldName(association, dynamicModelrepository, constFieldNameInSource));
+					.addPropertyValue(KspProperty.FK_FIELD_NAME, buildFkFieldName(association, dynamicModelrepository));
 
 		}
 		return associationDefinitionBuilder.build();
 	}
 
-	private static String buildFkFieldName(final XmlAssociation association, final DslDefinitionRepository dynamicModelrepository, final boolean constFieldNameInSource) {
+	private static String buildFkFieldName(final XmlAssociation association, final DslDefinitionRepository dynamicModelrepository) {
 		// Dans le cas d'une association simple, on recherche le nom de la FK
 		// recherche de code de contrainte destiné à renommer la fk selon convention du vbsript PowerAMC
 		// Cas de la relation 1-n : où le nom de la FK est redéfini.
 		// Exemple : DOS_UTI_LIQUIDATION (relation entre dossier et utilisateur : FK >> UTILISATEUR_ID_LIQUIDATION)
-		final DslDefinition dtDefinitionA = dynamicModelrepository.getDefinition(getDtDefinitionName(association.getCodeA(), constFieldNameInSource));
-		final DslDefinition dtDefinitionB = dynamicModelrepository.getDefinition(getDtDefinitionName(association.getCodeB(), constFieldNameInSource));
+		final DslDefinition dtDefinitionA = dynamicModelrepository.getDefinition(getDtDefinitionName(association.getCodeA()));
+		final DslDefinition dtDefinitionB = dynamicModelrepository.getDefinition(getDtDefinitionName(association.getCodeB()));
 
 		final DslDefinition foreignDefinition = AssociationUtil.isAPrimaryNode(association.getMultiplicityA(), association.getMultiplicityB()) ? dtDefinitionA : dtDefinitionB;
 		final List<DslDefinition> primaryKeys = foreignDefinition.getChildDefinitions(DomainGrammar.ID_FIELD);
@@ -214,8 +213,8 @@ public abstract class AbstractXmlLoader implements Loader {
 		if (dtDefinitionA.getName().equals(dtDefinitionB.getName()) && association.getCodeName() == null) {
 			throw new IllegalArgumentException("Pour l'association '" + association.getCode() + "' le nom de la clé est obligatoire (AutoJointure) '"
 					+ foreignDefinition.getName()
-					+ "'. Ce nom est déduit du code l'association, le code doit être composé ainsi : {Trigramme Table1}_{Trigramme Table2}_{Code association}."
-					+ " Par exemple : DOS_UTI_EMMETEUR, DOS_UTI_DESTINATAIRE, DOS_DOS_PARENT, ...");
+					+ "'. Ce nom est déduit du code l'association, le code doit être composé ainsi : {Trigramme Table1}{Trigramme Table2}{Code association}."
+					+ " Par exemple : DosUtiEmmeteur, DosUtiDestinataire, DosDosParent, ...");
 		}
 
 		//On récupère le nom de LA clé primaire .
@@ -227,11 +226,7 @@ public abstract class AbstractXmlLoader implements Loader {
 		//Si l'association possède une nom défini par l'utilisateur, alors on l'ajoute à la FK avec un séparateur.
 		if (association.getCodeName() != null) {
 			//On construit le nom de la clé étrangère.
-			if (constFieldNameInSource) {
-				fkFieldName = fkFieldName + StringUtil.constToUpperCamelCase(association.getCodeName());
-			} else {
-				fkFieldName = fkFieldName + StringUtil.first2UpperCase(association.getCodeName());
-			}
+			fkFieldName = fkFieldName + StringUtil.first2UpperCase(association.getCodeName());
 		}
 
 		//On raccourci le nom de la clé étrangère.
@@ -248,9 +243,8 @@ public abstract class AbstractXmlLoader implements Loader {
 		return fkFieldName;
 	}
 
-	private static String getDtDefinitionName(final String code, final boolean constFieldNameInSource) {
-		final String dtDefinitionLocalName = constFieldNameInSource ? StringUtil.constToUpperCamelCase(code.toUpperCase(Locale.ENGLISH)) : code;
-		return DT_DEFINITION_PREFIX + dtDefinitionLocalName;
+	private static String getDtDefinitionName(final String code) {
+		return DT_DEFINITION_PREFIX + code;
 	}
 
 }

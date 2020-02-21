@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@
 package io.vertigo.dynamo.plugins.environment.loaders.xml;
 
 import io.vertigo.lang.Assertion;
+import io.vertigo.util.StringUtil;
 
 /**
  * Association.
@@ -33,8 +34,8 @@ import io.vertigo.lang.Assertion;
  * @author pchretien, pforhan
  */
 public final class XmlAssociation {
-	private static final int SECOND_SEPARATOR = 7;
-	private static final int FIRST_SEPARATOR = 3;
+	private static final int SECOND_SEPARATOR = 3;
+	private static final int FIRST_SEPARATOR = 0;
 	private final String code;
 	private final String packageName;
 
@@ -98,9 +99,9 @@ public final class XmlAssociation {
 	}
 
 	/**
-	 * Formatage du code : AAA_YYY_{CODE NAME}
-	 * AAA = Trois première lettre du code de A
-	 * BBB = Trois première lettre du code de B
+	 * Formatage du code : AaaBbb{CodeName}
+	 * Aaa = Trois première lettre du code de A
+	 * Bbb = Trois première lettre du code de B
 	 * Le nom défini par l'utilisateur est facultatif.
 	 *
 	 * @return Code de l'association
@@ -114,8 +115,10 @@ public final class XmlAssociation {
 	 * @return Nom de l'association défini par l'utilisateur. (Peut être null)
 	 */
 	public String getCodeName() {
-		if (code.length() > 8 && code.charAt(FIRST_SEPARATOR) == '_' && code.charAt(SECOND_SEPARATOR) == '_') {
-			return code.substring(8);
+		if (code.length() > 6
+				&& StringUtil.isUpperCamelCase(code.substring(FIRST_SEPARATOR, FIRST_SEPARATOR + 2))
+				&& StringUtil.isUpperCamelCase(code.substring(SECOND_SEPARATOR, SECOND_SEPARATOR + 2))) {
+			return code.substring(6);
 		}
 		return null;
 	}
@@ -171,7 +174,7 @@ public final class XmlAssociation {
 
 	/**
 	 * @return Code de l'entité A participant à l'association
-	
+
 	 */
 	public String getCodeA() {
 		return codeA;

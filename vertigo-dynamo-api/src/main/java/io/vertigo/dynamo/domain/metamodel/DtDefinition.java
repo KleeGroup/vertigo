@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -64,6 +64,7 @@ public final class DtDefinition implements Definition {
 
 	private final Optional<DtField> sortFieldOpt;
 	private final Optional<DtField> displayFieldOpt;
+	private final Optional<DtField> handleFieldOpt;
 
 	private final String dataSpace;
 
@@ -78,7 +79,8 @@ public final class DtDefinition implements Definition {
 			final List<DtField> dtFields,
 			final String dataSpace,
 			final Optional<DtField> sortField,
-			final Optional<DtField> displayField) {
+			final Optional<DtField> displayField,
+			final Optional<DtField> handleField) {
 		DefinitionUtil.checkName(name, DtDefinition.class);
 		Assertion.checkNotNull(fragment);
 		Assertion.checkNotNull(stereotype);
@@ -87,6 +89,7 @@ public final class DtDefinition implements Definition {
 		Assertion.checkState(REGEX_DATA_SPACE.matcher(dataSpace).matches(), "dataSpace {0} must match pattern {1}", dataSpace, REGEX_DATA_SPACE);
 		Assertion.checkNotNull(sortField);
 		Assertion.checkNotNull(displayField);
+		Assertion.checkNotNull(handleField);
 		//-----
 		this.name = name;
 		//
@@ -98,6 +101,7 @@ public final class DtDefinition implements Definition {
 
 		sortFieldOpt = sortField;
 		displayFieldOpt = displayField;
+		handleFieldOpt = handleField;
 
 		for (final DtField dtField : dtFields) {
 			Assertion.when(stereotype.isPersistent() && dtField.isPersistent())
@@ -260,6 +264,13 @@ public final class DtDefinition implements Definition {
 	 */
 	public Optional<DtField> getSortField() {
 		return sortFieldOpt;
+	}
+
+	/**
+	 * @return Champ représentant le handle
+	 */
+	public Optional<DtField> getHandleField() {
+		return handleFieldOpt;
 	}
 
 	/**

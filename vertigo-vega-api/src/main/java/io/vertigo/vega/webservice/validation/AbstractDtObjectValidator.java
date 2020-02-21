@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -90,9 +90,7 @@ public abstract class AbstractDtObjectValidator<O extends DtObject> implements D
 	protected final void checkFieldEquals(final O dto, final String fieldName1, final String fieldName2, final DtObjectErrors dtObjectErrors, final MessageText messageText) {
 		final Object value1 = getValue(fieldName1, dto);
 		final Object value2 = getValue(fieldName2, dto);
-		if (value1 == null && value2 != null //
-				|| value1 != null && value2 == null //
-				|| value1 != null && !value1.equals(value2)) {
+		if (!(value1 == null ? value2 == null : value1.equals(value2))) { //not (equals or both null)
 			dtObjectErrors.addError(fieldName2, messageText);
 		}
 	}
@@ -124,7 +122,7 @@ public abstract class AbstractDtObjectValidator<O extends DtObject> implements D
 	protected final void checkFieldLongAfter(final O dto, final String fieldName1, final String fieldName2, final DtObjectErrors dtObjectErrors, final MessageText messageText) {
 		final Long value1 = (Long) getValue(fieldName1, dto); //la valeur typée peut être null
 		final Long value2 = (Long) getValue(fieldName2, dto);
-		if (value1 != null && value2 != null && !(value2.compareTo(value1) > 0)) {
+		if (value1 != null && value2 != null && value2.compareTo(value1) <= 0) {
 			dtObjectErrors.addError(fieldName2, messageText);
 		}
 	}

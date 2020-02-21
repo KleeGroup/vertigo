@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,9 +22,7 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
-import io.vertigo.core.component.Activeable;
 import io.vertigo.core.param.ParamValue;
-import io.vertigo.lang.WrappedException;
 import io.vertigo.vega.impl.webservice.filter.JettyMultipartCleaner;
 import io.vertigo.vega.impl.webservice.filter.JettyMultipartConfig;
 import spark.Spark;
@@ -33,7 +31,7 @@ import spark.Spark;
  * RoutesRegisterPlugin use to register Spark-java route.
  * @author npiedeloup
  */
-public final class SparkJavaEmbeddedWebServerPlugin extends AbstractSparkJavaWebServerPlugin implements Activeable {
+public final class SparkJavaEmbeddedWebServerPlugin extends AbstractSparkJavaWebServerPlugin {
 
 	/**
 	 * @param apiPrefix globale api prefix
@@ -50,23 +48,4 @@ public final class SparkJavaEmbeddedWebServerPlugin extends AbstractSparkJavaWeb
 		Spark.before(new JettyMultipartConfig(tempDir));
 		Spark.after(new JettyMultipartCleaner());
 	}
-
-	@Override
-	public void start() {
-		// nothing
-
-	}
-
-	@Override
-	public void stop() {
-		Spark.stop();
-		// we need to sleep because spark starts a new thread to stop the server
-		try {
-			Thread.sleep(100L);
-		} catch (final InterruptedException e) {
-			throw WrappedException.wrap(e);
-		}
-
-	}
-
 }

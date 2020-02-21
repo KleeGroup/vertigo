@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,7 @@ package io.vertigo.commons.peg;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import io.vertigo.lang.Assertion;
@@ -35,7 +36,7 @@ public final class PegRulesHtmlRenderer {
 	private final Map<PegRule<?>, String> allRules = new LinkedHashMap<>();
 	private final Map<Integer, Map<String, PegGrammarRule<?>>> namedRules = new LinkedHashMap<>();
 
-	String render(final PegRule<?> rootRule) {
+	public String render(final PegRule<?> rootRule) {
 		return obtainGrammar(rootRule).entrySet()
 				.stream()
 				.map(entry -> new StringBuilder()
@@ -59,6 +60,11 @@ public final class PegRulesHtmlRenderer {
 		for (final Map<String, PegGrammarRule<?>> entry : namedRules.values()) {
 			for (final PegGrammarRule<?> pegGrammar : entry.values()) {
 				rules.put(pegGrammar.getRuleName(), readGramar(pegGrammar.getRule())); //On resoud les conflits de noms en conservant l'ordre des profondeurs.
+			}
+		}
+		if (rules.isEmpty()) {
+			for (final Entry<PegRule<?>, String> pegEntry : allRules.entrySet()) {
+				rules.put("Rule-" + pegEntry.hashCode(), pegEntry.getValue());
 			}
 		}
 		return rules;
@@ -112,19 +118,21 @@ public final class PegRulesHtmlRenderer {
 	}
 
 	private void sequence(final PegSequenceRule rule) {
-		populateGramar(rule, rule.getRules().isEmpty() ? "Skip()" : ("Sequence("
-				+ rule.getRules().stream()
-						.map(this::readGramar)
-						.collect(Collectors.joining(", "))
-				+ ")"));
+		populateGramar(rule, rule.getRules().isEmpty() ? "Skip()"
+				: "Sequence("
+						+ rule.getRules().stream()
+								.map(this::readGramar)
+								.collect(Collectors.joining(", "))
+						+ ")");
 	}
 
 	private void choice(final PegChoiceRule rule) {
-		populateGramar(rule, rule.getRules().isEmpty() ? "Skip()" : ("Choice(0,"
-				+ rule.getRules().stream()
-						.map(this::readGramar)
-						.collect(Collectors.joining(", "))
-				+ ")"));
+		populateGramar(rule, rule.getRules().isEmpty() ? "Skip()"
+				: "Choice(0,"
+						+ rule.getRules().stream()
+								.map(this::readGramar)
+								.collect(Collectors.joining(", "))
+						+ ")");
 	}
 
 	private void many(final PegManyRule<?> rule) {

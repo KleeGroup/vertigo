@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,6 @@
  */
 package io.vertigo.account.plugins.account.cache.redis;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -34,7 +33,6 @@ import io.vertigo.commons.impl.connectors.redis.RedisConnector;
 import io.vertigo.dynamo.domain.model.UID;
 import io.vertigo.dynamo.file.model.VFile;
 import io.vertigo.lang.Assertion;
-import io.vertigo.lang.WrappedException;
 import io.vertigo.util.MapBuilder;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Transaction;
@@ -81,8 +79,6 @@ public final class RedisAccountCachePlugin implements AccountCachePlugin {
 				tx.hset(HAUTHTOKEN_INDEX_KEY, account.getAuthToken(), account.getId());
 				tx.sadd(SACCOUNTS_KEY, account.getId());
 				tx.exec();
-			} catch (final IOException ex) {
-				throw WrappedException.wrap(ex);
 			}
 		}
 	}
@@ -112,10 +108,7 @@ public final class RedisAccountCachePlugin implements AccountCachePlugin {
 				tx.hmset(HGROUP_START_KEY + group.getId(), group2Map(group));
 				tx.sadd(SGROUPS_KEY, group.getId());
 				tx.exec();
-			} catch (final IOException ex) {
-				throw WrappedException.wrap(ex);
 			}
-
 		}
 	}
 
@@ -173,10 +166,7 @@ public final class RedisAccountCachePlugin implements AccountCachePlugin {
 					tx.sadd(SGROUPS_BY_ACCOUNT_START_KEY + accountURI.getId(), groupUID.getId().toString());
 				}
 				tx.exec();
-			} catch (final IOException ex) {
-				throw WrappedException.wrap(ex);
 			}
-
 		}
 	}
 
@@ -193,10 +183,7 @@ public final class RedisAccountCachePlugin implements AccountCachePlugin {
 					tx.sadd(SGROUPS_BY_ACCOUNT_START_KEY + accountUID.getId(), groupURI.getId().toString());
 				}
 				tx.exec();
-			} catch (final IOException ex) {
-				throw WrappedException.wrap(ex);
 			}
-
 		}
 	}
 
@@ -269,10 +256,7 @@ public final class RedisAccountCachePlugin implements AccountCachePlugin {
 			try (final Transaction tx = jedis.multi()) {
 				tx.hmset(HPHOTO_BY_ACCOUNT_START_KEY + accountUID.getId(), vFileMapPhoto);
 				tx.exec();
-			} catch (final IOException ex) {
-				throw WrappedException.wrap(ex);
 			}
-
 		}
 	}
 
@@ -297,8 +281,6 @@ public final class RedisAccountCachePlugin implements AccountCachePlugin {
 				//todo : les haccount, photos et accountsByGroup", "photoByAccount ne sont pas supprimées
 				tx.del(SACCOUNTS_KEY, SGROUPS_KEY, "accountsByGroup", "photoByAccount", HAUTHTOKEN_INDEX_KEY);
 				tx.exec();
-			} catch (final IOException ex) {
-				throw WrappedException.wrap(ex);
 			}
 		}
 	}

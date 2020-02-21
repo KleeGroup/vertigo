@@ -14,10 +14,10 @@
 	/**
 	 * Execute la tache ${taskDefinition.name}.
 	<#list taskDefinition.inAttributes as taskAttribute>
-	 * @param ${taskAttribute.variableName} ${taskAttribute.dataType} <#if !taskAttribute.required>(peut être null)</#if>
+	 * @param ${taskAttribute.variableName} ${taskAttribute.javaTypeLabel} <#if !taskAttribute.required>(peut être null)</#if>
 	</#list>
 	<#if taskDefinition.out>
-	 * @return <#if !taskDefinition.outAttribute.required>Option de </#if>${taskDefinition.outAttribute.dataType} ${taskDefinition.outAttribute.variableName}
+	 * @return <#if !taskDefinition.outAttribute.required>Option de </#if>${taskDefinition.outAttribute.javaTypeLabel} ${taskDefinition.outAttribute.variableName}
 	</#if>
 	*/
 	public <#if taskDefinition.out><#if !taskDefinition.outAttribute.required>Optional<</#if>${taskDefinition.outAttribute.dataType}<#if !taskDefinition.outAttribute.required>></#if><#else>void</#if> ${taskDefinition.methodName}(<#list taskDefinition.inAttributes as taskAttribute>final <#if !taskAttribute.required>Optional<</#if>${taskAttribute.dataType}<#if !taskAttribute.required>></#if> ${taskAttribute.variableName}<#if taskAttribute_has_next>, </#if></#list>) {

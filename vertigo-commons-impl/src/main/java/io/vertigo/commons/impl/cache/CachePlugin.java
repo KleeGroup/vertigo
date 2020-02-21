@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -82,9 +82,9 @@ public interface CachePlugin extends Plugin {
 	default HealthMeasure checkIo() {
 		final HealthMeasureBuilder healthMeasureBuilder = HealthMeasure.builder();
 		try {
-			put("CACHE_HEALTH_VERTIGO", "healthcheckkey", "healthcheckvalue");
-			get("CACHE_HEALTH_VERTIGO", "healthcheckkey");
-			remove("CACHE_HEALTH_VERTIGO", "healthcheckkey");
+			put("CacheHealthVertigo", "healthcheckkey", "healthcheckvalue");
+			get("CacheHealthVertigo", "healthcheckkey");
+			remove("CacheHealthVertigo", "healthcheckkey");
 			healthMeasureBuilder.withGreenStatus();
 		} catch (final Exception e) {
 			healthMeasureBuilder.withRedStatus(e.getMessage(), e);

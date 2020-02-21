@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,9 +20,6 @@ package io.vertigo.database.sql.vendor.h2;
 
 import java.util.Optional;
 
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
-
 import io.vertigo.database.impl.sql.vendor.h2.H2DataBase;
 import io.vertigo.database.sql.AbstractSqlDialectTest;
 import io.vertigo.database.sql.vendor.SqlDialect;
@@ -31,7 +28,6 @@ import io.vertigo.database.sql.vendor.SqlDialect;
  *
  * @author mlaroche
  */
-@RunWith(JUnitPlatform.class)
 public final class H2SqlDialectTest extends AbstractSqlDialectTest {
 
 	@Override

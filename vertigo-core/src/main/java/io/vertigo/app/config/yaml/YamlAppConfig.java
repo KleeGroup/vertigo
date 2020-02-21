@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,8 +27,8 @@ public final class YamlAppConfig {
 
 	public YamlNodeConfig node;
 	public YamlBootConfig boot;
-	public LinkedHashMap<String, YamlModuleConfig> modules = new LinkedHashMap<>();
-	public List<YamlInitializerConfig> initializers = new ArrayList<>();
+	public final LinkedHashMap<String, YamlModuleConfig> modules = new LinkedHashMap<>();
+	public final List<YamlInitializerConfig> initializers = new ArrayList<>();
 
 	public static final class YamlNodeConfig {
 		public String appName;
@@ -39,7 +39,6 @@ public final class YamlAppConfig {
 	public static final class YamlBootConfig {
 		public YamlParamsConfig params;
 		public List<YamlPluginConfig> plugins = new ArrayList<>();
-
 	}
 
 	public static class YamlModuleConfig {
@@ -50,23 +49,22 @@ public final class YamlAppConfig {
 	}
 
 	public static class YamlFeatureConfig extends LinkedHashMap<String, Map<String, Object>> {
-		private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = -2681657188040880067L;
 		//nothing more
 	}
 
 	public static class YamlPluginConfig extends LinkedHashMap<String, Map<String, Object>> {
-		private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = 7801652174493689560L;
 		//nothing more
 	}
 
 	public static class YamlParamsConfig extends LinkedHashMap<String, String> {
-		private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = -3551104464145560067L;
 		// nothing more
 	}
 
 	public static class YamlInitializerConfig extends LinkedHashMap<String, Map<String, Object>> {
-		private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = -8925834051505358263L;
 		// nothing more
 	}
-
 }

@@ -7,3 +7,7 @@ create FileInfo FiFileInfoStd {
 create FileInfo FiFileInfoTemp {
 	storeName : "temp"
 }
+
+create FileInfo FiFileInfoFs {
+	storeName : "fsStore"
+}

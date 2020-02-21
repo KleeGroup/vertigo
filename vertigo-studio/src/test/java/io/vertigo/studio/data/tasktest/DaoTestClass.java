@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,7 +28,6 @@ import io.vertigo.app.config.LogConfig;
 import io.vertigo.app.config.ModuleConfig;
 import io.vertigo.app.config.NodeConfig;
 import io.vertigo.commons.CommonsFeatures;
-import io.vertigo.commons.plugins.cache.memory.MemoryCachePlugin;
 import io.vertigo.commons.transaction.VTransactionManager;
 import io.vertigo.commons.transaction.VTransactionWritable;
 import io.vertigo.core.param.Param;
@@ -46,6 +45,7 @@ import io.vertigo.studio.mda.DataBaseScriptUtil;
 import io.vertigo.studio.plugins.mda.task.test.TaskTestDaoChecker;
 import io.vertigo.studio.plugins.mda.task.test.TaskTestDummyGenerator;
 import io.vertigo.studio.plugins.mda.task.test.TaskTestDummyGeneratorBasic;
+import io.vertigo.studio.tasktest.DaoPAO;
 
 public class DaoTestClass extends AbstractTestCaseJU5 {
 
@@ -64,7 +64,8 @@ public class DaoTestClass extends AbstractTestCaseJU5 {
 				.withLogConfig(new LogConfig("/log4j.xml"))
 				.endBoot()
 				.addModule(new CommonsFeatures()
-						.addPlugin(MemoryCachePlugin.class)
+						.withCache()
+						.withMemoryCache()
 						.withScript()
 						.withJaninoScript()
 						.build())
@@ -83,8 +84,9 @@ public class DaoTestClass extends AbstractTestCaseJU5 {
 				.addModule(ModuleConfig.builder("dao")
 						// to use this class for actual test target/javagen must contains those two dao classes and target/javagen must be included as a source folder
 						// .addComponent(CarDAO.class)
-						// .addComponent(DaoPAO.class)
+						.addComponent(DaoPAO.class)
 						.addDefinitionProvider(DefinitionProviderConfig.builder(DynamoDefinitionProvider.class)
+								.addDefinitionResource("classes", "io.vertigo.studio.data.DtDefinitions")
 								.addDefinitionResource("kpr", "io/vertigo/studio/data/generationWTask.kpr")
 								.build())
 						.build())
@@ -93,7 +95,7 @@ public class DaoTestClass extends AbstractTestCaseJU5 {
 
 	@Override
 	protected void doSetUp() throws Exception {
-		execSqlScript("target/databasegenMasterdata/crebas.sql", Home.getApp());
+		execSqlScript("io/vertigo/studio/data/sql/crebas.sql", Home.getApp());
 		currentTransaction = transactionManager.createCurrentTransaction();
 	}
 

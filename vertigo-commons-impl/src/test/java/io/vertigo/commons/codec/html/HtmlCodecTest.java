@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -53,26 +53,26 @@ public final class HtmlCodecTest extends AbstractCodecTest<String, String> {
 	@Test
 	public void testEncode() {
 		//Caractères simples sans encodage
-		assertEquals(codec.encode("abcdefghijklmnopqrstuvwxyz"), "abcdefghijklmnopqrstuvwxyz");
-		assertEquals(codec.encode("0123456789"), "0123456789");
-		assertEquals(codec.encode("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-		assertEquals(codec.encode(" "), " ");
-		assertEquals(codec.encode(""), "");
-		assertEquals(codec.encode("/"), "/");
-		assertEquals(codec.encode(";"), ";");
-		assertEquals(codec.encode("-"), "-");
+		assertEquals("abcdefghijklmnopqrstuvwxyz", codec.encode("abcdefghijklmnopqrstuvwxyz"));
+		assertEquals("0123456789", codec.encode("0123456789"));
+		assertEquals("ABCDEFGHIJKLMNOPQRSTUVWXYZ", codec.encode("ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
+		assertEquals(" ", codec.encode(" "));
+		assertEquals("", codec.encode(""));
+		assertEquals("/", codec.encode("/"));
+		assertEquals(";", codec.encode(";"));
+		assertEquals("-", codec.encode("-"));
 		//Mixte de caractères simples
-		assertEquals(codec.encode("abcdef; 01234/ABCDEF-"), "abcdef; 01234/ABCDEF-");
+		assertEquals("abcdef; 01234/ABCDEF-", codec.encode("abcdef; 01234/ABCDEF-"));
 		//Accents
-		assertEquals(codec.encode("é"), "&eacute;");
-		assertEquals(codec.encode("è"), "&egrave;");
+		assertEquals("&eacute;", codec.encode("é"));
+		assertEquals("&egrave;", codec.encode("è"));
 		//Symbole euro
-		assertEquals(codec.encode(Character.toString((char) 8364)), "&euro;");
-		assertEquals(codec.encode(Character.toString((char) 128)), "&euro;");
+		assertEquals("&euro;", codec.encode(Character.toString((char) 8364)));
+		assertEquals("&euro;", codec.encode(Character.toString((char) 128)));
 		// < >
-		assertEquals(codec.encode("<tag>"), "&lt;tag&gt;");
+		assertEquals("&lt;tag&gt;", codec.encode("<tag>"));
 		// caractères spéciaux :  "
-		assertEquals(codec.encode("\""), "&quot;");
+		assertEquals("&quot;", codec.encode("\""));
 
 		/*
 		 Pour réaliser des benchs de perfs
@@ -89,26 +89,26 @@ public final class HtmlCodecTest extends AbstractCodecTest<String, String> {
 	@Test
 	public void testDecode() {
 		//Caractères simples sans encodage
-		assertEquals(codec.decode("abcdefghijklmnopqrstuvwxyz"), "abcdefghijklmnopqrstuvwxyz");
-		assertEquals(codec.decode("0123456789"), "0123456789");
-		assertEquals(codec.decode("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-		assertEquals(codec.decode(" "), " ");
-		assertEquals(codec.decode(""), "");
-		assertEquals(codec.decode("/"), "/");
-		assertEquals(codec.decode("&"), "&");
-		assertEquals(codec.decode(";"), ";");
-		assertEquals(codec.decode("-"), "-");
+		assertEquals("abcdefghijklmnopqrstuvwxyz", codec.decode("abcdefghijklmnopqrstuvwxyz"));
+		assertEquals("0123456789", codec.decode("0123456789"));
+		assertEquals("ABCDEFGHIJKLMNOPQRSTUVWXYZ", codec.decode("ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
+		assertEquals(" ", codec.decode(" "));
+		assertEquals("", codec.decode(""));
+		assertEquals("/", codec.decode("/"));
+		assertEquals("&", codec.decode("&"));
+		assertEquals(";", codec.decode(";"));
+		assertEquals("-", codec.decode("-"));
 		//Mixte de caractères simples
-		assertEquals(codec.decode("abcdef; 01234/ABCDEF-"), "abcdef; 01234/ABCDEF-");
+		assertEquals("abcdef; 01234/ABCDEF-", codec.decode("abcdef; 01234/ABCDEF-"));
 		//Accents
-		assertEquals(codec.decode("&eacute;"), "é");
-		assertEquals(codec.decode("&egrave;"), "è");
+		assertEquals("é", codec.decode("&eacute;"));
+		assertEquals("è", codec.decode("&egrave;"));
 		//Symbole euro (dans HtmlCodec, l'euro est actuellement transformé en char 128)
-		assertEquals(codec.decode("&euro;"), Character.toString((char) 128));
+		assertEquals(Character.toString((char) 128), codec.decode("&euro;"));
 		// < >
-		assertEquals(codec.decode("&lt;tag&gt;"), "<tag>");
+		assertEquals("<tag>", codec.decode("&lt;tag&gt;"));
 		// caractères spéciaux :  "
-		assertEquals(codec.decode("&quot;"), "\"");
+		assertEquals("\"", codec.decode("&quot;"));
 	}
 
 	/** {@inheritDoc} */

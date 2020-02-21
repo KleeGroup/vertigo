@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,7 +39,7 @@ public final class TempFile extends File {
 	}
 
 	/**
-	 * Crée un fichier temporaire qui sera supprimé lorsqu'il ne sera plus référencé.
+	 * Crée un fichier temporaire.
 	 * @param prefix Prefix du nom de fichier
 	 * @param suffix Suffix du nom de fichier
 	 * @param subDirectory Sous-répertoire des fichiers temporaires (null = répertoire temporaire de vertigo = ${java.io.tmpdir}/vertigo)
@@ -51,7 +51,7 @@ public final class TempFile extends File {
 	}
 
 	/**
-	 * Crée un fichier temporaire qui sera supprimé lorsqu'il ne sera plus référencé.
+	 * Crée un fichier temporaire.
 	 * @param prefix Prefix du nom de fichier
 	 * @param suffix Suffix du nom de fichier
 	 * @throws IOException Exception IO

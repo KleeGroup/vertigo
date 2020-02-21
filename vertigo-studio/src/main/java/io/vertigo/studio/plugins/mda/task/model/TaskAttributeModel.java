@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -56,6 +56,13 @@ public final class TaskAttributeModel {
 	 */
 	public String getDataType() {
 		return String.valueOf(DomainUtil.buildJavaType(taskAttribute.getDomain()));
+	}
+
+	/**
+	 * @return Type java du champ
+	 */
+	public String getJavaTypeLabel() {
+		return DomainUtil.buildJavaTypeLabel(taskAttribute.getDomain());
 	}
 
 	/**

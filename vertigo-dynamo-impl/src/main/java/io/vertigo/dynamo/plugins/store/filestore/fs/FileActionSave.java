@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,14 +16,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**
- *
- */
 package io.vertigo.dynamo.plugins.store.filestore.fs;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,11 +30,12 @@ import org.apache.logging.log4j.Logger;
 import io.vertigo.commons.transaction.VTransactionAfterCompletionFunction;
 import io.vertigo.dynamo.file.util.FileUtil;
 import io.vertigo.lang.Assertion;
+import io.vertigo.lang.Tuple;
 import io.vertigo.lang.VSystemException;
 import io.vertigo.lang.WrappedException;
 
 /**
- * Classe de gestion de la sauvegarde d'un fichier.
+ * Handling saving file to disk.
  *
  * @author skerdudou
  */
@@ -45,28 +45,39 @@ final class FileActionSave implements VTransactionAfterCompletionFunction {
 	private static final Logger LOG = LogManager.getLogger(FileActionSave.class.getName());
 
 	//ref the file before this save action
-	private final File txPrevFile;
-	//ref the new file to save on this transaction
-	private final File txNewFile;
+	private final List<Tuple<File, File>> txSaveFiles = new ArrayList<>();
 
 	/**
 	 * Constructor.
 	 *
-	 * @param inputStream l'inputStream du fichier
-	 * @param path le chemin de destination du fichier
+	 * @param inputStream File inputStream
+	 * @param path Location of the file
 	 */
 	public FileActionSave(final InputStream inputStream, final String path) {
+		add(inputStream, path);
+	}
+
+	/**
+	 * Add same live span file to save.
+	 *
+	 * @param inputStream File inputStream
+	 * @param path Location of the file
+	 */
+	public FileActionSave add(final InputStream inputStream, final String path) {
 		Assertion.checkNotNull(inputStream);
 		Assertion.checkNotNull(path);
 		//-----
-		txPrevFile = new File(path);
-		txNewFile = new File(path + EXT_SEPARATOR + System.currentTimeMillis() + EXT_SEPARATOR + EXT_NEW);
+		final File txFinalFile = new File(path);
+		final File txNewFile = new File(path + EXT_SEPARATOR + System.currentTimeMillis() + EXT_SEPARATOR + EXT_NEW);
 
-		// création du fichier temporaire
-		if (!txNewFile.getParentFile().exists() && !txNewFile.getParentFile().mkdirs()) {
+		// Creation of the folder containing the file
+		// the double check of exists() is for concurrency check, another process can have created the folder between our instructions
+		if (!txNewFile.getParentFile().exists() && !txNewFile.getParentFile().mkdirs() && !txNewFile.getParentFile().exists()) {
 			LOG.error("Can't create temp directories {}", txNewFile.getAbsolutePath());
 			throw new VSystemException("Can't create temp directories");
 		}
+
+		// Creation of the temporary file inside the destination folder
 		try {
 			if (!txNewFile.createNewFile()) {
 				LOG.error("Can't create temp file {}", txNewFile.getAbsolutePath());
@@ -77,14 +88,17 @@ final class FileActionSave implements VTransactionAfterCompletionFunction {
 			throw WrappedException.wrap(e, "Can't save temp file.");
 		}
 
-		// copie des données dans le fichier temporaire. Permet de vérifier l'espace disque avant d'arriver à la phase
-		// de commit. Si la phase de commit a une erreur, garde trace du fichier sur le FS.
+		// Write data into the temp file. By doing this before the commit phase, we ensure we have enough space left.
 		try {
 			FileUtil.copy(inputStream, txNewFile);
 		} catch (final IOException e) {
 			LOG.error("Can't copy uploaded file to : {}", txNewFile.getAbsolutePath());
 			throw WrappedException.wrap(e, "Can't save uploaded file.");
 		}
+
+		txSaveFiles.add(Tuple.of(txNewFile, txFinalFile));
+
+		return this;
 	}
 
 	/** {@inheritDoc} */
@@ -98,25 +112,31 @@ final class FileActionSave implements VTransactionAfterCompletionFunction {
 	}
 
 	private void doCommit() {
-		// on supprime l'ancien fichier s'il existe
-		if (txPrevFile.exists() && !txPrevFile.delete()) {
-			LOG.fatal("Impossible supprimer l'ancien fichier ({}) lors de la sauvegarde. Le fichier a sauvegarder se trouve dans {}", txPrevFile.getAbsolutePath(), txNewFile.getAbsolutePath());
-			throw new VSystemException("Erreur fatale : Impossible de sauvegarder le fichier.");
-		}
+		for (final Tuple<File, File> tuple : txSaveFiles) {
+			final File txNewFile = tuple.getVal1();
+			final File txFinalFile = tuple.getVal2();
 
-		// on met le fichier au bon emplacement
-		if (!txNewFile.renameTo(txPrevFile)) {
-			LOG.fatal("Impossible sauvegarder le fichier. Déplacement impossible de {} vers {}", txNewFile.getAbsolutePath(), txPrevFile.getAbsolutePath());
-			throw new VSystemException("Erreur fatale : Impossible de sauvegarder le fichier.");
+			// Clean old file if exist
+			if (txFinalFile.exists() && !txFinalFile.delete()) {
+				LOG.fatal("Can't save file. Error replacing previous file ({}). A copy of the new file to save is kept into {}", txFinalFile.getAbsolutePath(), txNewFile.getAbsolutePath());
+				throw new VSystemException("An error occured while saving the file.");
+			}
+			// we move the temp file to it's final destination
+			if (!txNewFile.renameTo(txFinalFile)) {
+				LOG.fatal("Can't save file. Error moving the file {} to it's final location {}", txNewFile.getAbsolutePath(), txFinalFile.getAbsolutePath());
+				throw new VSystemException("An error occured while saving the file.");
+			}
 		}
 	}
 
 	private void doRollback() {
-		// on ne fait pas de ménage si on a eu une erreur
-		if (txNewFile.exists()) {
-			if (!txNewFile.delete()) {
-				LOG.error("Can't rollback and delete file : {}", txNewFile.getAbsolutePath());
+		// cleaning temp file on error
+		for (final Tuple<File, File> tuple : txSaveFiles) {
+			final File txNewFile = tuple.getVal1();
+			if (txNewFile.exists() && !txNewFile.delete()) {
+				LOG.error("Can't delete file {} on rollback", txNewFile.getAbsolutePath());
 			}
 		}
+
 	}
 }

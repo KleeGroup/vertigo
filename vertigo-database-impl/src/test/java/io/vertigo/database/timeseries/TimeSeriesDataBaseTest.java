@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -74,6 +74,53 @@ public final class TimeSeriesDataBaseTest extends AbstractTestCaseJU5 {
 				Collections.singletonList("temp:mean"),
 				DataFilter.builder("test").build(),
 				TimeFilter.builder("now() - 1h", "now()").withTimeDim("1m").build());
+	}
+
+	@Test
+	public void testReadMeasuresClusteredTimeSeries() {
+		timeSeriesDataBaseManager.getClusteredTimeSeries(
+				"vertigo-test",
+				new ClusteredMeasure("test:mean", Collections.singletonList(10)),
+				DataFilter.builder("test").build(),
+				TimeFilter.builder("now() - 1h", "now()").withTimeDim("1m").build());
+	}
+
+	@Test
+	public void testReadMeasuresTimedTabular() {
+
+		timeSeriesDataBaseManager.getTabularTimedData(
+				"vertigo-test",
+				Collections.singletonList("temp:mean"),
+				DataFilter.builder("test").build(),
+				TimeFilter.builder("now() - 1h", "now()").withTimeDim("1m").build());
+	}
+
+	@Test
+	public void testReadMeasuresTabular() {
+		timeSeriesDataBaseManager.getTabularData(
+				"vertigo-test",
+				Collections.singletonList("temp:mean"),
+				DataFilter.builder("test").build(),
+				TimeFilter.builder("now() - 1h", "now()").withTimeDim("1m").build());
+	}
+
+	@Test
+	public void testReadMeasuresTags() {
+		timeSeriesDataBaseManager.getTagValues(
+				"vertigo-test",
+				"temp",
+				"myTag");
+	}
+
+	@Test
+	public void testReadMeasuresTops() {
+		timeSeriesDataBaseManager.getTops(
+				"vertigo-test",
+				"temp:mean",
+				DataFilter.builder("test").build(),
+				TimeFilter.builder("now() - 1h", "now()").withTimeDim("1m").build(),
+				"temp",
+				10);
 	}
 
 	@Override

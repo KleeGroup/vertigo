@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,9 +18,20 @@
  */
 package io.vertigo.dynamo.store.datastore.multistore;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
+
+import javax.inject.Inject;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -39,8 +50,11 @@ import io.vertigo.dynamo.TestUtil;
 import io.vertigo.dynamo.file.model.FileInfo;
 import io.vertigo.dynamo.file.model.VFile;
 import io.vertigo.dynamo.file.util.FileUtil;
+import io.vertigo.dynamo.impl.store.filestore.FileStorePlugin;
 import io.vertigo.dynamo.plugins.environment.DynamoDefinitionProvider;
+import io.vertigo.dynamo.plugins.store.filestore.fs.FsFullFileStorePlugin;
 import io.vertigo.dynamo.store.StoreCacheDefinitionProvider;
+import io.vertigo.dynamo.store.data.fileinfo.FileInfoFs;
 import io.vertigo.dynamo.store.data.fileinfo.FileInfoTemp;
 import io.vertigo.dynamo.store.datastore.AbstractStoreManagerTest;
 import io.vertigo.dynamo.store.datastore.SqlUtil;
@@ -85,9 +99,13 @@ public final class MultiStoreManagerTest extends AbstractStoreManagerTest {
 								Param.of("dataSpace", "otherStore"),
 								Param.of("connectionName", "otherBase"))
 						.withDbFileStore(Param.of("storeDtName", "DtVxFileInfo"))
+						.withFsFileStore(Param.of("name", "fsStore"),
+								Param.of("path", "${java.io.tmpdir}/testFsVertigo/"),
+								Param.of("storeDtName", "DtVxFileInfo"))
 						.withFsFullFileStore(
 								Param.of("name", "temp"),
-								Param.of("path", "${java.io.tmpdir}/testVertigo/"))
+								Param.of("path", "${java.io.tmpdir}/testVertigo/"),
+								Param.of("purgeDelayMinutes", "0"))
 						.build())
 				.addModule(ModuleConfig.builder("myApp")
 						.addDefinitionProvider(DefinitionProviderConfig.builder(DynamoDefinitionProvider.class)
@@ -118,6 +136,18 @@ public final class MultiStoreManagerTest extends AbstractStoreManagerTest {
 	@Override
 	protected void doTearDown() throws Exception {
 		super.doTearDown();
+
+		final Path tempFsDir = Paths.get(FileUtil.translatePath("${java.io.tmpdir}/testFsVertigo/"));
+		removeAllPath(tempFsDir);
+	}
+
+	private void removeAllPath(final Path pathToBeDeleted) throws IOException {
+		if (Files.exists(pathToBeDeleted)) {
+			Files.walk(pathToBeDeleted)
+					.sorted(Comparator.reverseOrder())
+					.map(Path::toFile)
+					.forEach(File::delete);
+		}
 	}
 
 	@Override
@@ -144,6 +174,8 @@ public final class MultiStoreManagerTest extends AbstractStoreManagerTest {
 			//2. Sauvegarde en Temp
 			createdFileInfo = storeManager.getFileStore().create(fileInfo);
 			transaction.commit(); //can't read file if not commited (TODO ?)
+			System.out.println("testOtherStoreFile " + createdFileInfo.getURI().toURN());
+
 		}
 
 		try (final VTransactionWritable transaction = transactionManager.createCurrentTransaction()) {
@@ -154,14 +186,18 @@ public final class MultiStoreManagerTest extends AbstractStoreManagerTest {
 			//4. comparaison du fichier créé et du fichier lu.
 
 			final String source;
-			try (final OutputStream sourceOS = new java.io.ByteArrayOutputStream()) {
-				FileUtil.copy(vFile.createInputStream(), sourceOS);
+			try (final OutputStream sourceOS = new ByteArrayOutputStream()) {
+				try (final InputStream sourceIS = vFile.createInputStream()) {
+					FileUtil.copy(sourceIS, sourceOS);
+				}
 				source = sourceOS.toString();
 			}
 
 			final String read;
-			try (final OutputStream readOS = new java.io.ByteArrayOutputStream()) {
-				FileUtil.copy(readFileInfo.getVFile().createInputStream(), readOS);
+			try (final OutputStream readOS = new ByteArrayOutputStream()) {
+				try (final InputStream in = readFileInfo.getVFile().createInputStream()) {
+					FileUtil.copy(in, readOS);
+				}
 				read = readOS.toString();
 			}
 			//on vérifie que le contenu des fichiers est identique.
@@ -177,4 +213,89 @@ public final class MultiStoreManagerTest extends AbstractStoreManagerTest {
 			//Assertions.assertTrue("Test contenu du fichier : " + secureSubString(read, 15579, "adieu !à ;"), read.indexOf("adieu !à ;") > 0);
 		}
 	}
+
+	@Test
+	public void testCreateTempFile() throws Exception {
+		doCreateFile(this::createTempFileInfo);
+	}
+
+	@Test
+	public void testUpdateTempFile() throws Exception {
+		doUpdateFile(this::createTempFileInfo);
+	}
+
+	@Test
+	public void testDeleteTempFile() throws Exception {
+		doDeleteFile(this::createTempFileInfo);
+	}
+
+	@Test
+	public void testCreateFsFile() throws Exception {
+		doCreateFile(this::createFsFileInfo);
+	}
+
+	@Test
+	public void testUpdateFsFile() throws Exception {
+		doUpdateFile(this::createFsFileInfo);
+	}
+
+	@Test
+	public void testDeleteFsFile() throws Exception {
+		doDeleteFile(this::createFsFileInfo);
+	}
+
+	protected FileInfo createTempFileInfo(final VFile vFile) {
+		return new FileInfoTemp(vFile);
+	}
+
+	protected FileInfo createFsFileInfo(final VFile vFile) {
+		return new FileInfoFs(vFile);
+	}
+
+	@Inject
+	private List<FileStorePlugin> fileStorePlugins;
+
+	@Test
+	public void testRemovedOldFileDaemon() throws Exception {
+		final Path tempDir = Paths.get(FileUtil.translatePath("${java.io.tmpdir}/testVertigo/"));
+		final long firstCount = fileCount(tempDir);
+
+		Thread.sleep(1000); //wait remove dir
+
+		final VFile vFile = TestUtil.createVFile(fileManager, "../data/lautreamont.txt", AbstractStoreManagerTest.class);
+		try (final VTransactionWritable transaction = transactionManager.createCurrentTransaction()) {
+			//1.Création du fichier depuis un fichier texte du FS
+			final FileInfo fileInfo = new FileInfoTemp(vFile);
+			//2. Sauvegarde en Temp
+			final FileInfo createdFileInfo = storeManager.getFileStore().create(fileInfo);
+			System.out.println(createdFileInfo.getURI().toURN());
+			transaction.commit(); //can't read file if not commited (TODO ?)
+		}
+
+		final long beforeCount = fileCount(tempDir);
+
+		Assertions.assertEquals(firstCount + 2, beforeCount, "Created file wasn't store in temp dir");
+
+		Thread.sleep(1000); //wait remove dir
+
+		fileStorePlugins.stream()
+				.filter((plugin) -> plugin instanceof FsFullFileStorePlugin)
+				.findFirst().ifPresent(
+						(plugin) -> ((FsFullFileStorePlugin) plugin).deleteOldFiles());
+
+		Thread.sleep(1000); //wait remove dir
+
+		final long afterCount = fileCount(tempDir);
+
+		Assertions.assertEquals(0, afterCount, "Clean of temp dir wasn't complete");
+
+	}
+
+	public long fileCount(final Path dir) throws IOException {
+		try (Stream<Path> subFiles = Files.walk(dir)) {
+			return subFiles.filter(p -> !Files.isDirectory(p))
+					.count();
+		}
+	}
+
 }

@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -136,10 +136,10 @@ public final class SqlVendorMapping implements SqlMapping {
 				final Timestamp ts = Timestamp.from(instant);
 				statement.setTimestamp(index, ts);
 			} else if (DataStream.class.isAssignableFrom(dataType)) {
+				final DataStream dataStream = (DataStream) value;
 				try {
-					final DataStream dataStream = (DataStream) value;
 					//Notice : setBinaryStream() without length is NOT implemented by all the database drivers.
-					statement.setBinaryStream(index, dataStream.createInputStream(), (int) dataStream.getLength());
+					statement.setBinaryStream(index, new CloseAtEoFInputStream(dataStream.createInputStream(), (int) dataStream.getLength()), (int) dataStream.getLength());
 				} catch (final IOException e) {
 					throw new SQLException("writing error", e);
 				}

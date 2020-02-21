@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,6 +37,7 @@ import io.vertigo.dynamo.store.StoreManager;
 import io.vertigo.dynamox.task.AbstractTaskEngineSQL;
 import io.vertigo.lang.Assertion;
 import io.vertigo.lang.Tuple;
+import io.vertigo.util.StringUtil;
 
 /**
  * Permet l'appel de requête insert en utilisant generatedKeys du PreparedStatement pour récupérer
@@ -79,7 +80,7 @@ public class TaskEngineInsertWithGeneratedKeys extends AbstractTaskEngineSQL {
 		final DtField idField = dtDefinition.getIdField().get();
 
 		final Tuple<Integer, ?> result = getDataBaseManager()
-				.executeUpdateWithGeneratedKey(sqlStatement, generationMode, idField.getName(), idField.getDomain().getJavaClass(), connection);
+				.executeUpdateWithGeneratedKey(sqlStatement, generationMode, StringUtil.camelToConstCase(idField.getName()), idField.getDomain().getJavaClass(), connection);
 
 		final Object id = result.getVal2();
 		idField.getDataAccessor().setValue(entity, id);

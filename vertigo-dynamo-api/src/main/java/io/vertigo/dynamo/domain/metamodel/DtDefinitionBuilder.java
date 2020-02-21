@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -66,6 +66,7 @@ public final class DtDefinitionBuilder implements Builder<DtDefinition> {
 	private String myDataSpace;
 	private String mySortFieldName;
 	private String myDisplayFieldName;
+	private String myHandleFieldName;
 
 	/**
 	 * Constructor.
@@ -303,19 +304,31 @@ public final class DtDefinitionBuilder implements Builder<DtDefinition> {
 		return this;
 	}
 
+	/**
+	 * Specifies which field to be used for handle
+	 * @param handleFieldName fieldName to use
+	 * @return this builder
+	 */
+	public DtDefinitionBuilder withHandleField(final String handleFieldName) {
+		myHandleFieldName = handleFieldName;
+		return this;
+	}
+
 	/** {@inheritDoc} */
 	@Override
 	public DtDefinition build() {
 		Assertion.checkState(dtDefinition == null, "build() already executed");
 		//-----
 		if (myStereotype == null) {
-			myStereotype = (myIdField == null) ? DtStereotype.ValueObject : DtStereotype.Entity;
+			myStereotype = myIdField == null ? DtStereotype.ValueObject : DtStereotype.Entity;
 		}
 
 		final DtField sortField;
 		if (mySortFieldName != null) {
 			sortField = findFieldByName(mySortFieldName)
 					.orElseThrow(() -> new IllegalStateException(StringUtil.format("Sort field '{0}' not found on '{1}'", mySortFieldName, dtDefinition.getName())));
+		} else if (myStereotype == DtStereotype.Fragment) {
+			sortField = myFragmentRef.get().getSortField().orElse(null);
 		} else {
 			sortField = null;
 		}
@@ -324,8 +337,20 @@ public final class DtDefinitionBuilder implements Builder<DtDefinition> {
 		if (myDisplayFieldName != null) {
 			displayField = findFieldByName(myDisplayFieldName)
 					.orElseThrow(() -> new IllegalStateException(StringUtil.format("Display field '{0}' not found on '{1}'", myDisplayFieldName, dtDefinition.getName())));
+		} else if (myStereotype == DtStereotype.Fragment) {
+			displayField = myFragmentRef.get().getDisplayField().orElse(null);
 		} else {
 			displayField = null;
+		}
+
+		final DtField handleField;
+		if (myHandleFieldName != null) {
+			handleField = findFieldByName(myHandleFieldName)
+					.orElseThrow(() -> new IllegalStateException(StringUtil.format("Handle field '{0}' not found on '{1}'", myHandleFieldName, dtDefinition.getName())));
+		} else if (myStereotype == DtStereotype.Fragment) {
+			handleField = myFragmentRef.get().getHandleField().orElse(null);
+		} else {
+			handleField = null;
 		}
 
 		dtDefinition = new DtDefinition(
@@ -336,7 +361,8 @@ public final class DtDefinitionBuilder implements Builder<DtDefinition> {
 				myFields,
 				myDataSpace == null ? StoreManager.MAIN_DATA_SPACE_NAME : myDataSpace,
 				Optional.ofNullable(sortField),
-				Optional.ofNullable(displayField));
+				Optional.ofNullable(displayField),
+				Optional.ofNullable(handleField));
 		return dtDefinition;
 	}
 

@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -108,9 +108,9 @@ public final class GoogleJsonEngine implements JsonEngine {
 	}
 
 	@Inject
-	public GoogleJsonEngine(@ParamValue("searchApiVersion") final Optional<String> searchApiVersionStr) {
+	public GoogleJsonEngine(@ParamValue("serializeNulls") final Optional<Boolean> serializeNulls, @ParamValue("searchApiVersion") final Optional<String> searchApiVersionStr) {
 		final SearchApiVersion searchApiVersion = SearchApiVersion.valueOf(searchApiVersionStr.orElse(SearchApiVersion.V4.name()));
-		gson = createGson(searchApiVersion);
+		gson = createGson(serializeNulls.orElse(false), searchApiVersion);
 	}
 
 	/** {@inheritDoc} */
@@ -482,9 +482,13 @@ public final class GoogleJsonEngine implements JsonEngine {
 		}
 	}
 
-	private Gson createGson(final SearchApiVersion searchApiVersion) {
+	private Gson createGson(final boolean serializeNulls, final SearchApiVersion searchApiVersion) {
 		try {
-			return new GsonBuilder()
+			final GsonBuilder gsonBuilder = new GsonBuilder();
+			if (serializeNulls) {
+				gsonBuilder.serializeNulls();
+			}
+			return gsonBuilder
 					.setPrettyPrinting()
 					//.setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
 					.registerTypeHierarchyAdapter(Entity.class, new EntityJsonAdapter())

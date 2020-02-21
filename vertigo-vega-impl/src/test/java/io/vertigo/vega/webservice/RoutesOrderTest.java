@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,7 +49,7 @@ public final class RoutesOrderTest {
 
 	@BeforeAll
 	public static void setUp() {
-		app = new AutoCloseableApp(MyNodeConfig.config());
+		app = new AutoCloseableApp(MyNodeConfig.config(true));
 	}
 
 	@BeforeEach
@@ -133,6 +133,8 @@ public final class RoutesOrderTest {
 				.body("get(" + i++ + ")", Matchers.equalTo("Get /test/downloadFile (class java.lang.Integer :Query:id) -> VFile"))
 				.body("get(" + i++ + ")", Matchers.equalTo("Get /test/downloadFileContentType (class java.lang.Integer :Query:id) -> VFile"))
 				.body("get(" + i++ + ")", Matchers.equalTo("Get /test/downloadNotModifiedFile (class java.lang.Integer :Query:id, class java.util.Date :Header:If-Modified-Since, interface javax.servlet.http.HttpServletResponse :Implicit:Response) -> VFile"))
+				.body("get(" + i++ + ")", Matchers.equalTo("Get /test/dtList10/{id} (long :Path:id) -> class io.vertigo.dynamo.domain.model.DtList<Contact>"))
+				.body("get(" + i++ + ")", Matchers.equalTo("Get /test/dtList10elts/{id} (long :Path:id) -> class io.vertigo.dynamo.domain.model.DtList<Contact>"))
 				.body("get(" + i++ + ")", Matchers.equalTo("Get /test/dtListMeta () -> class io.vertigo.dynamo.domain.model.DtList<Contact>"))
 				.body("get(" + i++ + ")", Matchers.equalTo("Get /test/dtListMetaAsList () -> interface java.util.List<Contact>"))
 				.body("get(" + i++ + ")", Matchers.equalTo("Get /test/export/pdf/ () -> VFile"))
@@ -169,7 +171,7 @@ public final class RoutesOrderTest {
 				.body("get(" + i++ + ")", Matchers.equalTo("Post /secured/contacts/search() (class io.vertigo.vega.webservice.data.domain.ContactCriteria :Body:[1]) -> interface java.util.List<Contact>"))
 				.body("get(" + i++ + ")", Matchers.equalTo("Post /test/charset (class io.vertigo.vega.webservice.data.domain.Contact :Body:[1]) -> Contact"))
 				.body("get(" + i++ + ")", Matchers.equalTo("Post /test/contact (class io.vertigo.vega.webservice.data.domain.Contact :Body:[1]) -> Contact"))
-				.body("get(" + i++ + ")", Matchers.equalTo("Post /test/contact/secured (class io.vertigo.vega.webservice.data.domain.Contact :Body:[1], class java.lang.String :Query:token) -> String"))
+				.body("get(" + i++ + ")", Matchers.equalTo("Post /test/contactValidations (class io.vertigo.vega.webservice.data.domain.Contact :Body:[1]) -> Contact"))
 				.body("get(" + i++ + ")", Matchers.equalTo(" /*Test ws multipart body with objects. Send a body with an object of to field : contactFrom, contactTo. Each one should be an json of Contact.*/\nPost /test/innerbody (class io.vertigo.vega.webservice.data.domain.Contact :InnerBody:contactFrom, class io.vertigo.vega.webservice.data.domain.Contact :InnerBody:contactTo) -> interface java.util.List<Contact>"))
 				.body("get(" + i++ + ")", Matchers.equalTo(" /*Test ws multipart body with optional objects. Send a body with an object of to field : contactFrom, Optional<contactTo>. Each one should be an json of Contact.*/\nPost /test/innerbodyOptional (class io.vertigo.vega.webservice.data.domain.Contact :InnerBody:contactFrom, class io.vertigo.vega.webservice.data.domain.Contact :InnerBody:contactTo) -> interface java.util.List<Contact>"))
 				.body("get(" + i++ + ")", Matchers.equalTo(" /*Test ws multipart body with serverSide objects. Send a body with an object of to field : contactFrom, contactTo. Each one should be an partial json of Contact with clientId.*/\nPost /test/innerBodyServerClient (class io.vertigo.vega.webservice.data.domain.Contact :InnerBody:contactFrom, class io.vertigo.vega.webservice.data.domain.Contact :InnerBody:contactTo) -> interface java.util.List<Contact>"))
@@ -186,6 +188,8 @@ public final class RoutesOrderTest {
 				.body("get(" + i++ + ")", Matchers.equalTo("Post /test/searchPagined() (class io.vertigo.vega.webservice.data.domain.ContactCriteria :InnerBody:criteria, class io.vertigo.dynamo.domain.model.DtListState :InnerBody:listState) -> interface java.util.List<Contact>"))
 				.body("get(" + i++ + ")", Matchers.equalTo("Post /test/_searchQueryPagined (class io.vertigo.vega.webservice.data.domain.ContactCriteria :Body:[1], class io.vertigo.dynamo.domain.model.DtListState :Query:) -> interface java.util.List<Contact>"))
 				.body("get(" + i++ + ")", Matchers.equalTo("Post /test/string (class java.lang.String :Body:[1]) -> String"))
+				.body("get(" + i++ + ")", Matchers.equalTo("Post /test/string/optionalInnerBodyParam (class io.vertigo.vega.webservice.data.domain.Contact :Body:[1], class java.lang.String :InnerBody:token) -> String"))
+				.body("get(" + i++ + ")", Matchers.equalTo("Post /test/string/optionalQueryParam (class io.vertigo.vega.webservice.data.domain.Contact :Body:[1], class java.lang.String :Query:token) -> String"))
 				.body("get(" + i++ + ")", Matchers.equalTo(" /*Test ws returning UiContext. Send a body with an object of to field : contactId1, contactId2. Each one should be an json of long. You get partial Contacts with clientId in each one*/\nPost /test/uiContext (long :InnerBody:contactId1, long :InnerBody:contactId2) -> UiContext"))
 				.body("get(" + i++ + ")", Matchers.equalTo("Post /test/uiMessage (class io.vertigo.vega.webservice.data.domain.Contact :Body:[1], interface io.vertigo.vega.webservice.validation.UiMessageStack :Implicit:UiMessageStack) -> UiMessageStack"))
 				.body("get(" + i++ + ")", Matchers.equalTo("Post /test/uploadFile (interface io.vertigo.dynamo.file.model.VFile :Query:upfile, class java.lang.Integer :Query:id, class java.lang.String :Query:note) -> VFile"))

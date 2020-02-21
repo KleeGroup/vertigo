@@ -1,10 +1,53 @@
 Version history
 ===============
 
-Running 2.0.1-SNAPSHOT
+Running 3.0.0
 ----------------------
 
 more to come :)
+
+Release 2.1.0 - 2019/11/12
+----------------------
+
+* [core] add support of flag negation in yaml config
+* [commons] commands WIP
+* [commons] analytics better logger name
+* [database] Close DataStream when set as statement params
+* [dynamo] BugFix on concurrency saving first file of the day
+* [dynamo] UpperCamelCase feature when import domain definition from XMI
+* [dynamo] Merge pull request #137
+* [dynamo] fix EA and OOM Loaders with UpperCamelCase
+* [dynamo] fixed associations conventions in EA and OOM
+* [dynamo] move formatterId in dynamox
+* [dynamo] handles WIP
+* [vega] Merge pull request #138
+* [vega] Fix #141 Added serializeNulls params to GoogleJsonEngine. Default false
+* [vega] Fixed #142 Swagger parameterized type support only class or parameterizedType
+* [vega] Remaned AppServletStarter2 to AppServletStarterXml
+* [vega] Fixed #147 : can't close app if start fail
+* [vega] Fixed #148 when routes contains digits at end
+* [vega] Updated swagger ui site to v3.24.0
+* [studio] fix generated javadoc for xAO
+* [all] Updated libs versions
+    * junit-jupiter 5.4.2 -> 5.5.2
+    * freemarker 2.3.28 -> 2.3.29
+    * spark 2.8.0 -> 2.9.1
+    * rest-assured 3.3.0 -> 4.1.2
+    * log4j-core 2.11.2 -> 2.12.1
+    * slf4j 1.7.25 -> 1.7.28
+    * cglib 3.2.10 -> 3.3.0
+    * gson 2.8.5 -> 2.8.6
+    * snakeyaml 1.23 -> 1.25
+    * servlet-api 3.1.0 -> 4.0.1
+    * h2       1.4.199 -> 1.4.200
+    * postgresql 42.2.5 -> 42.2.8
+    * c3p0   0.9.5.3 -> 0.9.5.4
+    * janino 3.0.8 -> 3.1.0
+    * ehcache 2.10.6 -> 3.8.1
+    * jedis 2.9.0 -> 3.1.0
+    * lucene 8.0.0 -> 8.2.0
+    * elasticsearch 7.1.0 -> 7.4.1
+
 
 Release 2.0.0 - 2019/05/16
 ----------------------

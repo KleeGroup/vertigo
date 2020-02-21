@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -73,6 +73,10 @@ public abstract class AbstractHttpServletResponseWrapper extends javax.servlet.h
 	@Override
 	public final void addHeader(final String name, final String value) {
 		// nécessaire pour header gzip du filtre de compression
+		if ("Content-Length".equals(name)) {
+			setContentLength(Integer.parseInt(value));
+			return;
+		}
 		response.addHeader(name, value);
 	}
 
@@ -83,6 +87,10 @@ public abstract class AbstractHttpServletResponseWrapper extends javax.servlet.h
 	 */
 	@Override
 	public final void setHeader(final String name, final String value) {
+		if ("Content-Length".equals(name)) {
+			setContentLength(Integer.parseInt(value));
+			return;
+		}
 		response.setHeader(name, value);
 	}
 
@@ -177,6 +185,8 @@ public abstract class AbstractHttpServletResponseWrapper extends javax.servlet.h
 			writer.flush();
 		} else if (stream != null) {
 			stream.flush();
+		} else {
+			super.flushBuffer();
 		}
 	}
 
@@ -187,7 +197,7 @@ public abstract class AbstractHttpServletResponseWrapper extends javax.servlet.h
 	 */
 	@Override
 	public void setContentLength(final int length) {
-		getResponse().setContentLength(length);
+		response.setContentLength(length);
 	}
 
 	/**
@@ -197,6 +207,6 @@ public abstract class AbstractHttpServletResponseWrapper extends javax.servlet.h
 	 */
 	@Override
 	public final void setContentType(final String type) {
-		getResponse().setContentType(type);
+		response.setContentType(type);
 	}
 }

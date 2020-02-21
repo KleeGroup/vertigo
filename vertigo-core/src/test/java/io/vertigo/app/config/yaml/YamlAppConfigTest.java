@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,14 +24,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 
 import io.vertigo.app.AutoCloseableApp;
 import io.vertigo.app.config.NodeConfig;
 import io.vertigo.core.spaces.component.data.BioManager;
 
-@RunWith(JUnitPlatform.class)
 public final class YamlAppConfigTest {
 
 	@Test
@@ -66,6 +63,53 @@ public final class YamlAppConfigTest {
 		assertEquals("bio", nodeConfig.getAppName());
 		assertEquals("myFirstNodeId", nodeConfig.getNodeId());
 		assertEquals("http://localhost/", nodeConfig.getEndPoint().get());
+	}
+
+	@Test
+	public void testActiveFlagsMainConfig() {
+		final Properties params = new Properties();
+		params.setProperty("boot.activeFlags", "main");
+		final NodeConfig nodeConfig = new YamlAppConfigBuilder(params)
+				.withFiles(getClass(), "bio-flags.yaml")
+				.build();
+
+		testBioManager(nodeConfig);
+	}
+
+	@Test
+	public void testActiveFlagsSecondaryConfig() {
+		final Properties params = new Properties();
+		params.setProperty("boot.activeFlags", "secondary");
+		final NodeConfig nodeConfig = new YamlAppConfigBuilder(params)
+				.withFiles(getClass(), "bio-flags.yaml")
+				.build();
+
+		try (AutoCloseableApp app = new AutoCloseableApp(nodeConfig)) {
+			assertEquals(app, app);
+			assertTrue(app.getComponentSpace().contains("bioManager"));
+			final BioManager bioManager = app.getComponentSpace().resolve(BioManager.class);
+			final int res = bioManager.add(1, 2, 3);
+			assertEquals(336, res);
+			assertTrue(bioManager.isActive());
+		}
+	}
+
+	@Test
+	public void testNegateFlagsConfig() {
+		final Properties params = new Properties();
+		params.setProperty("boot.activeFlags", "main;customStart");
+		final NodeConfig nodeConfig = new YamlAppConfigBuilder(params)
+				.withFiles(getClass(), "bio-flags.yaml")
+				.build();
+
+		try (AutoCloseableApp app = new AutoCloseableApp(nodeConfig)) {
+			assertEquals(app, app);
+			assertTrue(app.getComponentSpace().contains("bioManager"));
+			final BioManager bioManager = app.getComponentSpace().resolve(BioManager.class);
+			final int res = bioManager.add(1, 2, 3);
+			assertEquals(666, res);
+			assertTrue(bioManager.isActive());
+		}
 	}
 
 	private void testBioManager(final NodeConfig nodeConfig) {

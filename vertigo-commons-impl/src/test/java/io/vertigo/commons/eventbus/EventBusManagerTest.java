@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,16 +18,16 @@
  */
 package io.vertigo.commons.eventbus;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import javax.inject.Inject;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import io.vertigo.AbstractTestCaseJU5;
-import io.vertigo.app.config.NodeConfig;
 import io.vertigo.app.config.ModuleConfig;
+import io.vertigo.app.config.NodeConfig;
 import io.vertigo.commons.CommonsFeatures;
 import io.vertigo.commons.eventbus.data.BlueColorEvent;
 import io.vertigo.commons.eventbus.data.DummyEvent;
@@ -92,16 +92,16 @@ public final class EventBusManagerTest extends AbstractTestCaseJU5 {
 		/*
 		 * We want to check that aspects are used.
 		 */
-		assertTrue(FlipAspect.isOff());
+		Assertions.assertTrue(FlipAspect.isOff());
 
 		eventBusManager.post(new BlueColorEvent()); //<< Flip here
-		assertTrue(FlipAspect.isOn());
+		Assertions.assertTrue(FlipAspect.isOn());
 
 		eventBusManager.post(new RedColorEvent()); //there is no aspect
-		assertTrue(FlipAspect.isOn());
+		Assertions.assertTrue(FlipAspect.isOn());
 
 		eventBusManager.post(new BlueColorEvent()); //<< Flip here
-		assertTrue(FlipAspect.isOff());
+		Assertions.assertTrue(FlipAspect.isOff());
 
 		assertEquals(0, deadEvents);
 	}

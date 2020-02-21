@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,6 @@
  */
 package io.vertigo.commons.plugins.app.registry.redis;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Optional;
@@ -40,7 +39,6 @@ import io.vertigo.commons.impl.connectors.redis.RedisConnector;
 import io.vertigo.core.definition.DefinitionReference;
 import io.vertigo.lang.Assertion;
 import io.vertigo.lang.JsonExclude;
-import io.vertigo.lang.WrappedException;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Transaction;
 
@@ -78,8 +76,6 @@ public final class RedisAppNodeRegistryPlugin implements AppNodeRegistryPlugin {
 				tx.hset(VERTIGO_NODE + node.getId(), "json", gson.toJson(node));
 				tx.sadd(VERTIGO_NODES, node.getId());
 				tx.exec();
-			} catch (final IOException e) {
-				throw WrappedException.wrap(e);
 			}
 		}
 	}
@@ -91,8 +87,6 @@ public final class RedisAppNodeRegistryPlugin implements AppNodeRegistryPlugin {
 				tx.del(VERTIGO_NODE + node.getId());
 				tx.srem(VERTIGO_NODES, node.getId());
 				tx.exec();
-			} catch (final IOException e) {
-				throw WrappedException.wrap(e);
 			}
 		}
 	}

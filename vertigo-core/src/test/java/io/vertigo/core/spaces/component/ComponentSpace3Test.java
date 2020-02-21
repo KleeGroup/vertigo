@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,20 +21,17 @@ package io.vertigo.core.spaces.component;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 
 import io.vertigo.app.AutoCloseableApp;
-import io.vertigo.app.config.NodeConfig;
 import io.vertigo.app.config.LogConfig;
 import io.vertigo.app.config.ModuleConfig;
+import io.vertigo.app.config.NodeConfig;
 import io.vertigo.core.param.Param;
 import io.vertigo.core.spaces.component.data.FunctionManager;
 import io.vertigo.core.spaces.component.data.FunctionManager1Impl;
 import io.vertigo.core.spaces.component.data.FunctionManager2Impl;
 import io.vertigo.core.spaces.component.data.FunctionPlugin;
 
-@RunWith(JUnitPlatform.class)
 public final class ComponentSpace3Test {
 
 	@Test

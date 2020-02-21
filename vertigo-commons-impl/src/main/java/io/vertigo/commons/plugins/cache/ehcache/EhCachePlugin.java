@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,8 +19,20 @@
 package io.vertigo.commons.plugins.cache.ehcache;
 
 import java.io.Serializable;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
+
+import org.ehcache.Cache;
+import org.ehcache.config.CacheConfiguration;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
+import org.ehcache.config.builders.CacheManagerBuilder;
+import org.ehcache.config.builders.ResourcePoolsBuilder;
+import org.ehcache.config.units.EntryUnit;
+import org.ehcache.config.units.MemoryUnit;
+import org.ehcache.expiry.ExpiryPolicy;
 
 import io.vertigo.app.Home;
 import io.vertigo.commons.cache.CacheDefinition;
@@ -28,8 +40,6 @@ import io.vertigo.commons.codec.CodecManager;
 import io.vertigo.commons.impl.cache.CachePlugin;
 import io.vertigo.core.component.Activeable;
 import io.vertigo.lang.Assertion;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
 
 /**
  * Implémentation EHCache du CacheManager.
@@ -37,7 +47,7 @@ import net.sf.ehcache.Element;
  * @author pchretien, npiedeloup
  */
 public final class EhCachePlugin implements Activeable, CachePlugin {
-	private final net.sf.ehcache.CacheManager manager;
+	private final org.ehcache.CacheManager manager;
 	private final CodecManager codecManager;
 
 	/**
@@ -49,19 +59,20 @@ public final class EhCachePlugin implements Activeable, CachePlugin {
 		Assertion.checkNotNull(codecManager);
 		//-----
 		this.codecManager = codecManager;
-		manager = net.sf.ehcache.CacheManager.create();
+		manager = CacheManagerBuilder.newCacheManagerBuilder().build();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void start() {
+		manager.init();
 		registerCaches();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void stop() {
-		manager.shutdown();
+		manager.close();
 	}
 
 	private void registerCaches() {
@@ -71,16 +82,34 @@ public final class EhCachePlugin implements Activeable, CachePlugin {
 	}
 
 	private void registerCache(final CacheDefinition cacheDefinition) {
-		if (!manager.cacheExists(cacheDefinition.getName())) {
-			final boolean overflowToDisk = cacheDefinition.shouldSerializeElements(); //don't overflow
-			final net.sf.ehcache.Cache cache = new net.sf.ehcache.Cache(cacheDefinition.getName(),
-					cacheDefinition.getMaxElementsInMemory(),
-					overflowToDisk,
-					false, //not eternal
-					cacheDefinition.getTimeToLiveSeconds(),
-					cacheDefinition.getTimeToIdleSeconds());
-			manager.addCache(cache);
+		final boolean overflowToDisk = cacheDefinition.shouldSerializeElements(); //don't overflow
+		final ResourcePoolsBuilder resourcePoolsBuilder = ResourcePoolsBuilder.newResourcePoolsBuilder()
+				.heap(cacheDefinition.getMaxElementsInMemory(), EntryUnit.ENTRIES);
+		if (overflowToDisk) {
+			resourcePoolsBuilder.disk(300, MemoryUnit.MB, true);
 		}
+
+		final CacheConfiguration<Serializable, Object> cacheConfiguration = CacheConfigurationBuilder.newCacheConfigurationBuilder(Serializable.class, Object.class,
+				resourcePoolsBuilder.build())
+				.withExpiry(new ExpiryPolicy<Serializable, Object>() {
+
+					@Override
+					public java.time.Duration getExpiryForCreation(final Serializable key, final Object value) {
+						return Duration.of(cacheDefinition.getTimeToLiveSeconds(), ChronoUnit.SECONDS); //time out after creation
+					}
+
+					@Override
+					public java.time.Duration getExpiryForAccess(final Serializable key, final Supplier<? extends Object> value) {
+						return Duration.of(cacheDefinition.getTimeToIdleSeconds(), ChronoUnit.SECONDS); //time out after an access
+					}
+
+					@Override
+					public java.time.Duration getExpiryForUpdate(final Serializable key, final Supplier<? extends Object> oldValue, final Object newValue) {
+						return null; // Keeping the existing expiry
+					}
+				})
+				.build();
+		manager.createCache(cacheDefinition.getName(), cacheConfiguration);
 	}
 
 	/** {@inheritDoc} */
@@ -118,36 +147,39 @@ public final class EhCachePlugin implements Activeable, CachePlugin {
 	/** {@inheritDoc} */
 	@Override
 	public boolean remove(final String context, final Serializable key) {
-		return getEHCache(context).remove(key);
+		getEHCache(context).remove(key);
+		return getEHCache(context).get(key) == null;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void clearAll() {
-		manager.clearAll();
+		Home.getApp().getDefinitionSpace()
+				.getAll(CacheDefinition.class).stream()
+				.forEach(cacheDefinition -> {
+					final Cache<?, ?> cache = manager.getCache(cacheDefinition.getName(), Serializable.class, Object.class);
+					if (cache != null) { //we maximized clear command, cache must exists
+						cache.clear();
+					}
+				});
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void clear(final String context) {
-		final Ehcache ehCache = manager.getCache(context);
-		if (ehCache != null) {
-			ehCache.removeAll();
-		}
+		getEHCache(context).clear();
 	}
 
-	private void putEH(final String context, final Object key, final Object value) {
-		final Element element = new Element(key, value);
-		getEHCache(context).put(element);
+	private void putEH(final String context, final Serializable key, final Object value) {
+		getEHCache(context).put(key, value);
 	}
 
-	private Object getEH(final String context, final Object key) {
-		final Element element = getEHCache(context).get(key);
-		return element == null ? null : element.getObjectValue();
+	private Object getEH(final String context, final Serializable key) {
+		return getEHCache(context).get(key);
 	}
 
-	private Ehcache getEHCache(final String context) {
-		final Ehcache ehCache = manager.getCache(context);
+	private Cache<Serializable, Object> getEHCache(final String context) {
+		final Cache<Serializable, Object> ehCache = manager.getCache(context, Serializable.class, Object.class);
 		Assertion.checkNotNull(ehCache, "Cache {0} are not yet registered. Add it into a file ehcache.xml and put it into the WEB-INF directory of your webapp.", context);
 		return ehCache;
 	}

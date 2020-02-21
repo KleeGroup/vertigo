@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -39,15 +40,20 @@ import io.vertigo.util.StringUtil;
 
 final class Criterion<E extends Entity> extends Criteria<E> {
 	private static final long serialVersionUID = -7797854063455062775L;
-	private final DtFieldName dtFieldName;
+
+	private static final Pattern ONLY_SIMPLE_CHAR_PATTERN = Pattern.compile("[A-Za-z0-9_]*");
+	private static final String DATE_PATTERN = "dd/MM/yyyy";
+	private static final String INSTANT_PATTERN = "dd/MM/yyyy HH:mm:ss";
+
+	private final DtFieldName<E> dtFieldName;
 	private final String sqlFieldName;
 	private final CriterionOperator criterionOperator;
 	private final Serializable[] values;
 
-	Criterion(final DtFieldName dtFieldName, final CriterionOperator criterionOperator, final Serializable... values) {
+	Criterion(final DtFieldName<E> dtFieldName, final CriterionOperator criterionOperator, final Serializable... values) {
 		Assertion.checkNotNull(dtFieldName);
 		Assertion.checkNotNull(criterionOperator);
-		Assertion.when(!CriterionOperator.IN.equals(criterionOperator))
+		Assertion.when(CriterionOperator.IN != criterionOperator)
 				.check(() -> criterionOperator.getArity() == values.length, "Only {0} argument(s) functions are allowed for operator '{1}'",
 						criterionOperator.getArity(),
 						criterionOperator);
@@ -85,23 +91,7 @@ final class Criterion<E extends Entity> extends Criteria<E> {
 			case LTE:
 				return sqlFieldName + " <= #" + ctx.attributeName(dtFieldName, values[0]) + "#";
 			case BETWEEN:
-				final CriterionLimit min = CriterionLimit.class.cast(values[0]);
-				final CriterionLimit max = CriterionLimit.class.cast(values[1]);
-				final StringBuilder sql = new StringBuilder();
-				if (min.isDefined()) {
-					sql.append(sqlFieldName)
-							.append(min.isIncluded() ? " >= " : " > ")
-							.append('#').append(ctx.attributeName(dtFieldName, min.getValue())).append('#');
-				}
-				if (max.isDefined()) {
-					if (sql.length() > 0) {
-						sql.append(" and ");
-					}
-					sql.append(sqlFieldName)
-							.append(max.isIncluded() ? " <= " : " < ")
-							.append('#').append(ctx.attributeName(dtFieldName, max.getValue())).append('#');
-				}
-				return "( " + sql.toString() + " )";
+				return toSqlBetweenCase(ctx);
 			case STARTS_WITH:
 				return sqlFieldName + " like  #" + ctx.attributeName(dtFieldName, values[0]) + "#" + sqlDialect.getConcatOperator() + "'%%'";
 			case IN:
@@ -113,6 +103,26 @@ final class Criterion<E extends Entity> extends Criteria<E> {
 		}
 	}
 
+	private String toSqlBetweenCase(final CriteriaCtx ctx) {
+		final CriterionLimit min = CriterionLimit.class.cast(values[0]);
+		final CriterionLimit max = CriterionLimit.class.cast(values[1]);
+		final StringBuilder sql = new StringBuilder();
+		if (min.isDefined()) {
+			sql.append(sqlFieldName)
+					.append(min.isIncluded() ? " >= " : " > ")
+					.append('#').append(ctx.attributeName(dtFieldName, min.getValue())).append('#');
+		}
+		if (max.isDefined()) {
+			if (sql.length() > 0) {
+				sql.append(" and ");
+			}
+			sql.append(sqlFieldName)
+					.append(max.isIncluded() ? " <= " : " < ")
+					.append('#').append(ctx.attributeName(dtFieldName, max.getValue())).append('#');
+		}
+		return "( " + sql.toString() + " )";
+	}
+
 	private static String prepareSqlInArgument(final Serializable value) {
 		Assertion.checkArgument(
 				value instanceof String
@@ -121,7 +131,7 @@ final class Criterion<E extends Entity> extends Criteria<E> {
 				"Only String,Long and Integers are allowed in a where in clause.");
 		// we check to avoid sql injection without espacing and parametizing the statement
 		Assertion.when(value instanceof String)
-				.check(() -> ((String) value).matches("[A-Za-z0-9_]*"), "Only simple characters are allowed");
+				.check(() -> ONLY_SIMPLE_CHAR_PATTERN.matcher((String) value).matches(), "Only simple characters are allowed");
 		// ---
 		if (value instanceof String) {
 			return "'" + value.toString() + "'";
@@ -180,30 +190,7 @@ final class Criterion<E extends Entity> extends Criteria<E> {
 				}
 				return ((Comparable) criterionValues[0]).compareTo(value) >= 0;
 			case BETWEEN:
-				if (value == null) {
-					return false;
-				}
-				final CriterionLimit min = CriterionLimit.class.cast(criterionValues[0]);
-				final CriterionLimit max = CriterionLimit.class.cast(criterionValues[1]);
-				if (!min.isDefined() && !max.isDefined()) {
-					return true;//there is no limit
-				}
-				boolean test = true;
-				if (min.isDefined()) {
-					if (min.isIncluded()) {
-						test = test && min.getValue().compareTo(value) <= 0;
-					} else {
-						test = test && min.getValue().compareTo(value) < 0;
-					}
-				}
-				if (max.isDefined()) {
-					if (max.isIncluded()) {
-						test = test && max.getValue().compareTo(value) >= 0;
-					} else {
-						test = test && max.getValue().compareTo(value) > 0;
-					}
-				}
-				return test;
+				return testBetweenCase(value, criterionValues);
 			//with String
 			case STARTS_WITH:
 				if (values[0] == null || value == null) {
@@ -218,8 +205,32 @@ final class Criterion<E extends Entity> extends Criteria<E> {
 		}
 	}
 
-	private static final String DATE_PATTERN = "dd/MM/yyyy";
-	private static final String INSTANT_PATTERN = "dd/MM/yyyy HH:mm:ss";
+	private boolean testBetweenCase(final Object value, final Serializable[] criterionValues) {
+		if (value == null) {
+			return false;
+		}
+		final CriterionLimit min = CriterionLimit.class.cast(criterionValues[0]);
+		final CriterionLimit max = CriterionLimit.class.cast(criterionValues[1]);
+		if (!min.isDefined() && !max.isDefined()) {
+			return true;//there is no limit
+		}
+		boolean test = true;
+		if (min.isDefined()) {
+			if (min.isIncluded()) {
+				test = test && min.getValue().compareTo(value) <= 0;
+			} else {
+				test = test && min.getValue().compareTo(value) < 0;
+			}
+		}
+		if (max.isDefined()) {
+			if (max.isIncluded()) {
+				test = test && max.getValue().compareTo(value) >= 0;
+			} else {
+				test = test && max.getValue().compareTo(value) > 0;
+			}
+		}
+		return test;
+	}
 
 	/**same as DtListPatternFilterUtil*/
 	private static Serializable valueOf(final DataType dataType, final String stringValue) {

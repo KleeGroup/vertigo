@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,7 +34,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 
 import io.vertigo.lang.DataStream;
 import io.vertigo.lang.WrappedException;
@@ -99,50 +99,50 @@ public final class Movies {
 		final LocalDateTime ldt = movie.getReleaseInstant() == null ? null : LocalDateTime.ofInstant(movie.getReleaseInstant(), ZoneId.of("UTC"));
 		switch (movie.getId().intValue()) {
 			case 1:
-				Assert.assertEquals(TITLE_MOVIE_1, movie.getTitle());
+				Assertions.assertEquals(TITLE_MOVIE_1, movie.getTitle());
 				//java.util.Date
-				Assert.assertEquals("01-05-1941 16:30", new SimpleDateFormat("dd-MM-YYYY HH:mm").format(movie.getReleaseDate()));
+				Assertions.assertEquals("01-05-1941 16:30", new SimpleDateFormat("dd-MM-YYYY HH:mm").format(movie.getReleaseDate()));
 				//LocalDate
-				Assert.assertEquals(1, movie.getReleaseLocalDate().getDayOfMonth());
-				Assert.assertEquals(5, movie.getReleaseLocalDate().getMonthValue());
-				Assert.assertEquals(1941, movie.getReleaseLocalDate().getYear());
+				Assertions.assertEquals(1, movie.getReleaseLocalDate().getDayOfMonth());
+				Assertions.assertEquals(5, movie.getReleaseLocalDate().getMonthValue());
+				Assertions.assertEquals(1941, movie.getReleaseLocalDate().getYear());
 				//Instant
-				Assert.assertEquals(1, ldt.getDayOfMonth());
-				Assert.assertEquals(5, ldt.getMonthValue());
-				Assert.assertEquals(1941, ldt.getYear());
-				Assert.assertEquals(16, ldt.getHour());
-				Assert.assertEquals(30, ldt.getMinute());
-				Assert.assertEquals(0, ldt.getSecond());
+				Assertions.assertEquals(1, ldt.getDayOfMonth());
+				Assertions.assertEquals(5, ldt.getMonthValue());
+				Assertions.assertEquals(1941, ldt.getYear());
+				Assertions.assertEquals(16, ldt.getHour());
+				Assertions.assertEquals(30, ldt.getMinute());
+				Assertions.assertEquals(0, ldt.getSecond());
 
 				break;
 			case 2:
-				Assert.assertEquals(TITLE_MOVIE_2, movie.getTitle());
+				Assertions.assertEquals(TITLE_MOVIE_2, movie.getTitle());
 				//java.util.Date
-				Assert.assertEquals("09-05-1958 16:30", new SimpleDateFormat("dd-MM-YYYY HH:mm").format(movie.getReleaseDate()));
+				Assertions.assertEquals("09-05-1958 16:30", new SimpleDateFormat("dd-MM-YYYY HH:mm").format(movie.getReleaseDate()));
 				//LocalDate
-				Assert.assertEquals(9, movie.getReleaseLocalDate().getDayOfMonth());
-				Assert.assertEquals(5, movie.getReleaseLocalDate().getMonthValue());
-				Assert.assertEquals(1958, movie.getReleaseLocalDate().getYear());
+				Assertions.assertEquals(9, movie.getReleaseLocalDate().getDayOfMonth());
+				Assertions.assertEquals(5, movie.getReleaseLocalDate().getMonthValue());
+				Assertions.assertEquals(1958, movie.getReleaseLocalDate().getYear());
 				//Instant
-				Assert.assertEquals(9, ldt.getDayOfMonth());
-				Assert.assertEquals(5, ldt.getMonthValue());
-				Assert.assertEquals(1958, ldt.getYear());
-				Assert.assertEquals(16, ldt.getHour());
-				Assert.assertEquals(30, ldt.getMinute());
-				Assert.assertEquals(0, ldt.getSecond());
+				Assertions.assertEquals(9, ldt.getDayOfMonth());
+				Assertions.assertEquals(5, ldt.getMonthValue());
+				Assertions.assertEquals(1958, ldt.getYear());
+				Assertions.assertEquals(16, ldt.getHour());
+				Assertions.assertEquals(30, ldt.getMinute());
+				Assertions.assertEquals(0, ldt.getSecond());
 
 				break;
 			case 3:
-				Assert.assertEquals(TITLE_MOVIE_3, movie.getTitle());
+				Assertions.assertEquals(TITLE_MOVIE_3, movie.getTitle());
 				//java.util.Date
-				Assert.assertEquals(null, movie.getReleaseDate());
+				Assertions.assertEquals(null, movie.getReleaseDate());
 				//LocalDate
-				Assert.assertEquals(null, movie.getReleaseLocalDate());
+				Assertions.assertEquals(null, movie.getReleaseLocalDate());
 				//Instant
-				Assert.assertEquals(null, ldt);
+				Assertions.assertEquals(null, ldt);
 				break;
 			default:
-				Assert.fail();
+				Assertions.fail();
 		}
 	}
 

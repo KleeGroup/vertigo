@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -106,6 +106,7 @@ public final class WebServiceDefinitionBuilder implements Builder<WebServiceDefi
 		//On rend le path plus lisible et compatible DefinitionName
 		final String normalizedConstString = argsRemovedPath.toUpperCase(Locale.ROOT)
 				.replaceAll("/", "_")
+				.replaceAll("([0-9]+)([^0-9])", "_$1_$2")
 				.replaceAll("([0-9]+)", "_$1")
 				.replaceAll("_+", "_");
 		final String normalizedString = StringUtil.constToUpperCamelCase(normalizedConstString);

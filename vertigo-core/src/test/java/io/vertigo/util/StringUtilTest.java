@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,14 +24,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 
 /**
  * Test de l'utilitaitre de manipulation des strings.
  * @author pchretien
  */
-@RunWith(JUnitPlatform.class)
 public final class StringUtilTest {
 	private static final String XXX_YYY_ZZZ = "XXX_YYY_ZZZ";
 
@@ -95,6 +92,8 @@ public final class StringUtilTest {
 		assertEquals("TAdresseAdr", StringUtil.constToUpperCamelCase("T_ADRESSE_ADR"));
 		assertEquals("x2Yyy", StringUtil.constToLowerCamelCase("X_2_YYY"));
 		assertEquals("X2Yyy", StringUtil.constToUpperCamelCase("X_2_YYY"));
+		assertEquals("TAdresseAdr10", StringUtil.constToUpperCamelCase("T_ADRESSE_ADR_10"));
+		assertEquals("TAdresseAdr10", StringUtil.constToUpperCamelCase("T_ADRESSE_ADR_10_"));
 	}
 
 	@Test

@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,6 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.lang.reflect.WildcardType;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -261,7 +260,7 @@ public final class SwaggerApiBuilder implements Builder<SwaggerApi> {
 			final Class<?> parameterClass;
 			if (type instanceof ParameterizedType
 					&& (((ParameterizedType) type).getActualTypeArguments().length == 1 || FacetedQueryResult.class.isAssignableFrom(objectClass))
-					&& !(((ParameterizedType) type).getActualTypeArguments()[0] instanceof WildcardType)) {
+					&& (((ParameterizedType) type).getActualTypeArguments()[0] instanceof Class || ((ParameterizedType) type).getActualTypeArguments()[0] instanceof ParameterizedType)) {
 				//We have checked there is one parameter or we known that FacetedQueryResult has two parameterized type
 				final Type itemsType = ((ParameterizedType) type).getActualTypeArguments()[0];
 				parameterClass = WebServiceTypeUtil.castAsClass(itemsType);

@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -65,8 +65,6 @@ import io.vertigo.util.StringUtil;
 public final class DomainDynamicRegistry implements DynamicRegistry {
 	private static final Logger LOGGER = LogManager.getLogger(DomainDynamicRegistry.class);
 	private static final String DOMAIN_PREFIX = DefinitionUtil.getPrefix(Domain.class);
-	private static final String ASSOCIATION_SIMPLE_DEFINITION_PREFIX = DefinitionUtil.getPrefix(AssociationSimpleDefinition.class);
-	private static final String ASSOCIATION_NN_DEFINITION_PREFIX = DefinitionUtil.getPrefix(AssociationNNDefinition.class);
 	private final Map<String, DtDefinitionBuilder> dtDefinitionBuilders = new HashMap<>();
 
 	@Override
@@ -158,6 +156,7 @@ public final class DomainDynamicRegistry implements DynamicRegistry {
 
 		final String sortFieldName = (String) xdtDefinition.getPropertyValue(KspProperty.SORT_FIELD);
 		final String displayFieldName = (String) xdtDefinition.getPropertyValue(KspProperty.DISPLAY_FIELD);
+		final String handleFieldName = (String) xdtDefinition.getPropertyValue(KspProperty.HANDLE_FIELD);
 
 		//0. clones characteristics
 		final DtDefinitionBuilder dtDefinitionBuilder = DtDefinition.builder(xdtDefinition.getName())
@@ -166,7 +165,8 @@ public final class DomainDynamicRegistry implements DynamicRegistry {
 				.withDataSpace(from.getDataSpace())
 				.withPackageName(from.getPackageName())
 				.withSortField(sortFieldName)
-				.withDisplayField(displayFieldName);
+				.withDisplayField(displayFieldName)
+				.withHandleField(handleFieldName);
 
 		//1. adds aliases
 		for (final DslDefinition alias : xdtDefinition.getChildDefinitions("alias")) {
@@ -221,6 +221,7 @@ public final class DomainDynamicRegistry implements DynamicRegistry {
 		//Déclaration de la définition
 		final String sortFieldName = (String) xdtDefinition.getPropertyValue(KspProperty.SORT_FIELD);
 		final String displayFieldName = (String) xdtDefinition.getPropertyValue(KspProperty.DISPLAY_FIELD);
+		final String handleFieldName = (String) xdtDefinition.getPropertyValue(KspProperty.HANDLE_FIELD);
 		//-----
 		final String tmpStereotype = (String) xdtDefinition.getPropertyValue(KspProperty.STEREOTYPE);
 		//Si Stereotype est non renseigné on suppose que la définition est DtStereotype.Data.
@@ -236,7 +237,8 @@ public final class DomainDynamicRegistry implements DynamicRegistry {
 				.withPackageName(xdtDefinition.getPackageName())
 				.withDataSpace(dataSpace)
 				.withSortField(sortFieldName)
-				.withDisplayField(displayFieldName);
+				.withDisplayField(displayFieldName)
+				.withHandleField(handleFieldName);
 
 		if (stereotype != null) {
 			dtDefinitionBuilder.withStereoType(stereotype);
@@ -355,8 +357,7 @@ public final class DomainDynamicRegistry implements DynamicRegistry {
 
 		final AssociationNode associationNodeA = new AssociationNode(dtDefinitionA, navigabilityA, roleA, labelA, true, false);
 		final AssociationNode associationNodeB = new AssociationNode(dtDefinitionB, navigabilityB, roleB, labelB, true, false);
-		final String name = fixAssociationName(ASSOCIATION_NN_DEFINITION_PREFIX, xassociation.getName());
-		return new AssociationNNDefinition(name, tableName, associationNodeA, associationNodeB);
+		return new AssociationNNDefinition(xassociation.getName(), tableName, associationNodeA, associationNodeB);
 	}
 
 	// méthode permettant de créer une liste de contraintes à partir d'une liste de noms de contrainte
@@ -364,18 +365,6 @@ public final class DomainDynamicRegistry implements DynamicRegistry {
 		return constraintNames.stream()
 				.map(constraintName -> definitionSpace.resolve(constraintName, ConstraintDefinition.class))
 				.collect(Collectors.toList());
-	}
-
-	/**
-	 * Corrige le nom des associations qui ne respectent pas la règle de nommage.
-	 * @param name Nom de l'association
-	 * @return Nom corrigé de l'association comprenant le préfix obligatoire.
-	 */
-	private static String fixAssociationName(final String prefix, final String name) {
-		if (!name.startsWith(prefix)) {
-			return prefix + name;
-		}
-		return name;
 	}
 
 	private AssociationSimpleDefinition createAssociationSimpleDefinition(final DefinitionSpace definitionSpace, final DslDefinition xassociation) {
@@ -407,7 +396,7 @@ public final class DomainDynamicRegistry implements DynamicRegistry {
 					navigabilityB = true;
 					break;
 				default:
-					throw new VSystemException("type of asssociation not supported :" + associationType);
+					throw new VSystemException("type of asssociation not supported : '{0}', available types are : '{1}'" + associationType, " *>1 , *>? , *>* ");
 			}
 		} else {
 			multiplicityA = (String) xassociation.getPropertyValue(KspProperty.MULTIPLICITY_A);
@@ -443,13 +432,10 @@ public final class DomainDynamicRegistry implements DynamicRegistry {
 		final String roleB = roleBOpt != null ? roleBOpt : dtDefinitionB.getLocalName();
 		final String labelB = (String) xassociation.getPropertyValue(KspProperty.LABEL_B);
 
-		//Relation 1-n ou 1-1
-		final String urn = fixAssociationName(ASSOCIATION_SIMPLE_DEFINITION_PREFIX, xassociation.getName());
-
 		final AssociationNode associationNodeA = new AssociationNode(dtDefinitionA, navigabilityA, roleA, labelA, AssociationUtil.isMultiple(multiplicityA), AssociationUtil.isNotNull(multiplicityA));
 		final AssociationNode associationNodeB = new AssociationNode(dtDefinitionB, navigabilityB, roleB, labelB, AssociationUtil.isMultiple(multiplicityB), AssociationUtil.isNotNull(multiplicityB));
 
-		final AssociationSimpleDefinition associationSimpleDefinition = new AssociationSimpleDefinition(urn, fkFieldName, associationNodeA, associationNodeB);
+		final AssociationSimpleDefinition associationSimpleDefinition = new AssociationSimpleDefinition(xassociation.getName(), fkFieldName, associationNodeA, associationNodeB);
 
 		final AssociationNode primaryAssociationNode = associationSimpleDefinition.getPrimaryAssociationNode();
 		final AssociationNode foreignAssociationNode = associationSimpleDefinition.getForeignAssociationNode();

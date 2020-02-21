@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,6 +24,7 @@ import io.vertigo.commons.analytics.AnalyticsManager;
 import io.vertigo.commons.app.AppManager;
 import io.vertigo.commons.cache.CacheManager;
 import io.vertigo.commons.codec.CodecManager;
+import io.vertigo.commons.command.CommandManager;
 import io.vertigo.commons.daemon.DaemonManager;
 import io.vertigo.commons.eventbus.EventBusManager;
 import io.vertigo.commons.impl.analytics.AnalyticsConnectorPlugin;
@@ -33,6 +34,7 @@ import io.vertigo.commons.impl.app.AppNodeInfosPlugin;
 import io.vertigo.commons.impl.app.AppNodeRegistryPlugin;
 import io.vertigo.commons.impl.cache.CacheManagerImpl;
 import io.vertigo.commons.impl.codec.CodecManagerImpl;
+import io.vertigo.commons.impl.command.CommandManagerImpl;
 import io.vertigo.commons.impl.connectors.redis.RedisConnector;
 import io.vertigo.commons.impl.daemon.DaemonManagerImpl;
 import io.vertigo.commons.impl.eventbus.EventBusManagerImpl;
@@ -185,6 +187,14 @@ public final class CommonsFeatures extends Features<CommonsFeatures> {
 	public CommonsFeatures withHttpAppNodeInfosPlugin() {
 		getModuleConfigBuilder()
 				.addPlugin(HttpAppNodeInfosPlugin.class);
+		return this;
+
+	}
+
+	@Feature("command")
+	public CommonsFeatures withCommand() {
+		getModuleConfigBuilder()
+				.addComponent(CommandManager.class, CommandManagerImpl.class);
 		return this;
 
 	}

@@ -1,7 +1,7 @@
 /**
  * vertigo - simple java starter
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+ * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
  * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -60,7 +60,7 @@ public final class VegaFeatures extends Features<VegaFeatures> {
 
 	private boolean tokensEnabled;
 	private String myTokens;
-	private String mySearchApiVersion;
+	private Param[] jsonParams = new Param[0];
 	private boolean rateLimitingEnabled;
 	private boolean securityEnabled;
 	private String myApiPrefix;
@@ -106,10 +106,9 @@ public final class VegaFeatures extends Features<VegaFeatures> {
 		return this;
 	}
 
-	@Feature("webservices.searchApiVersion")
-	public VegaFeatures withWebServicesSearchApiVersion(final Param... params) {
-		Assertion.checkState(params.length == 1 && "searchApiVersion".equals(params[0].getName()), "searchApiVersion param should be provided ");
-		mySearchApiVersion = params[0].getValue();
+	@Feature("webservices.json")
+	public VegaFeatures withWebServicesJson(final Param... params) {
+		jsonParams = params;
 		return this;
 	}
 
@@ -147,14 +146,9 @@ public final class VegaFeatures extends Features<VegaFeatures> {
 					.addPlugin(corsAllowerPluginConfigBuilder.build())
 					.addPlugin(AnalyticsWebServiceHandlerPlugin.class)
 					.addPlugin(JsonConverterWebServiceHandlerPlugin.class);
-			if (mySearchApiVersion != null) {
-				getModuleConfigBuilder()
-						.addComponent(JsonEngine.class, GoogleJsonEngine.class,
-								Param.of("searchApiVersion", mySearchApiVersion));
-			} else {
-				getModuleConfigBuilder()
-						.addComponent(JsonEngine.class, GoogleJsonEngine.class);
-			}
+
+			getModuleConfigBuilder()
+					.addComponent(JsonEngine.class, GoogleJsonEngine.class, jsonParams);
 
 			if (securityEnabled) {
 				getModuleConfigBuilder()
