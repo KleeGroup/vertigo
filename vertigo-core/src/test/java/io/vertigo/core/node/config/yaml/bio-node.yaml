@@ -1,0 +1,13 @@
+node:
+  appName: bio
+  nodeId: myFirstNodeId
+  endPoint: http://localhost/
+modules:
+  io.vertigo.core.node.config.yaml.YamlBioFeatures:
+      features:
+        - bio:
+        - math: 
+            start: 100
+      plugins:
+        - io.vertigo.core.node.component.data.SimpleMathPlugin: 
+            factor: 20

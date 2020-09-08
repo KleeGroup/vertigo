@@ -18,12 +18,12 @@
 		<dependency>
 		    <groupId>org.apache.logging.log4j</groupId>
 		    <artifactId>log4j-api</artifactId>
-		    <version>2.12.1</version> <!-- To avoid conflict of version, we must exclude log4j-api version when necessary -->
+		    <version>2.13.3</version> <!-- To avoid conflict of version, we must exclude log4j-api version when necessary -->
 		</dependency>
 		<dependency>
 		    <groupId>org.apache.logging.log4j</groupId>
 		    <artifactId>log4j-core</artifactId>
-		    <version>2.12.1</version> <!-- To avoid conflict of version, we must exclude log4j-core version when necessary -->
+		    <version>2.13.3</version> <!-- To avoid conflict of version, we must exclude log4j-core version when necessary -->
 		</dependency>
 		<dependency>
 			<groupId>javax.inject</groupId>
@@ -31,14 +31,9 @@
 			<version>1</version>
 		</dependency>
 		<dependency>
-			<groupId>cglib</groupId>
-			<artifactId>cglib-nodep</artifactId>
-			<version>3.3.0</version> <!-- proxies -->
-		</dependency>
-		<dependency>
 			<groupId>org.reflections</groupId>
 			<artifactId>reflections</artifactId>
-			<version>0.9.11</version>
+			<version>0.9.12</version>
 		</dependency> <!-- discovery -->
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
@@ -48,7 +43,12 @@
 		<dependency>
 			<groupId>org.yaml</groupId>
 			<artifactId>snakeyaml</artifactId>
-			<version>1.25</version>  <!-- yaml config -->
+			<version>1.26</version>  <!-- yaml config -->
+		</dependency>
+		<dependency>
+			<groupId>org.javassist</groupId>
+			<artifactId>javassist</artifactId>
+			<version>3.27.0-GA</version>
 		</dependency>
 	</dependencies>
 

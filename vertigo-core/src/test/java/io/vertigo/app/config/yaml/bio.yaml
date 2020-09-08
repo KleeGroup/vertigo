@@ -1,9 +1,0 @@
-modules:
-  io.vertigo.app.config.yaml.YamlBioFeatures:
-      features:
-        - bio:
-        - math: 
-            start: 100
-      plugins:
-        - io.vertigo.core.spaces.component.data.MathPlugin: 
-            factor: 20

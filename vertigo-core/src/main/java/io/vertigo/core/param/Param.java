@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +19,8 @@ package io.vertigo.core.param;
 
 import java.util.regex.Pattern;
 
-import io.vertigo.lang.Assertion;
-import io.vertigo.lang.VSystemException;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.lang.VSystemException;
 
 /**
  * Param.
@@ -42,14 +41,25 @@ public final class Param {
 	 * @param value the value of the param
 	 */
 	private Param(final String name, final String value) {
-		Assertion.checkArgNotEmpty(name);
-		Assertion.checkArgument(REGEX_PARAM_NAME.matcher(name).matches(), "param '{0}' must match pattern {1}", name, REGEX_PARAM_NAME);
-		Assertion.checkArgNotEmpty(name);
-		Assertion.checkNotNull(value);
+		Assertion.check()
+				.isNotBlank(name)
+				.isTrue(REGEX_PARAM_NAME.matcher(name).matches(), "param '{0}' must match pattern {1}", name, REGEX_PARAM_NAME)
+				.isNotBlank(name)
+				.isNotNull(value);
 		//---
 		this.name = name;
 		this.value = value;
 
+	}
+
+	/***
+	 * Creates a new Integer param
+	 * @param name the name of the param
+	 * @param value the value of the param
+	 * @return new param
+	 */
+	public static Param of(final String name, final Integer value) {
+		return new Param(name, Integer.toString(value));
 	}
 
 	/***
@@ -82,7 +92,8 @@ public final class Param {
 	 * @return the value of the param
 	 */
 	public <O> O getValue(final Class<O> paramType) {
-		Assertion.checkNotNull(paramType);
+		Assertion.check()
+				.isNotNull(paramType);
 		//-----
 		return (O) parse(name, paramType, value);
 	}
@@ -120,9 +131,10 @@ public final class Param {
 	}
 
 	private static Object parse(final String paramName, final Class<?> paramType, final String paramValue) {
-		Assertion.checkNotNull(paramName);
-		Assertion.checkNotNull(paramType);
-		Assertion.checkNotNull(paramValue);
+		Assertion.check()
+				.isNotNull(paramName)
+				.isNotNull(paramType)
+				.isNotNull(paramValue);
 		//-----
 		try {
 			if (String.class.equals(paramType)) {

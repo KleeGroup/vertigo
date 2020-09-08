@@ -1,0 +1,22 @@
+boot:
+  params: 
+    locales: fr_FR
+  plugins:
+    - io.vertigo.core.plugins.resource.classpath.ClassPathResourceResolverPlugin: {}
+modules:
+  io.vertigo.core.node.config.yaml.YamlBioFeatures:
+      features:
+        - bio:
+        - math:
+            __flags__: ["!customStart"]
+            start: 100
+        - math:
+            __flags__: ["customStart"]
+            start: 200
+      plugins:
+        - io.vertigo.core.node.component.data.SimpleMathPlugin: 
+            __flags__: ["main"]
+            factor: 20
+        - io.vertigo.core.node.component.data.SimpleMathPlugin: 
+            __flags__: ["secondary"]
+            factor: 10

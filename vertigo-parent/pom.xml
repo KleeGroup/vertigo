@@ -40,7 +40,7 @@
 		<connection>scm:git:https://github.com/vertigo-io/vertigo.git</connection>
 		<developerConnection>scm:git:https://github.com/vertigo-io/vertigo.git</developerConnection>
 		<url>scm:git:https://github.com/vertigo-io/vertigo.git</url>
-		<tag>vertigo-2.1.0</tag>
+		<tag>vertigo-3.0.0-SNAPHSOT</tag>
 	</scm>
 
 	<distributionManagement>
@@ -59,10 +59,10 @@
 	</distributionManagement>
 	
 	<properties>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<vertigo.version>2.1.0</vertigo.version>
+		<vertigo.version>3.0.0-RC</vertigo.version>
 
 		<!-- For global junit test coverage -->
 		<jacoco.destFile>${project.basedir}/../target/jacoco-it.exec</jacoco.destFile>
@@ -73,13 +73,13 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
-			<version>5.5.2</version>
+			<version>5.6.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
-			<version>5.5.2</version>
+			<version>5.6.2</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -118,10 +118,6 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>3.8.1</version>
-					<configuration>
-						<source>1.8</source>
-						<target>1.8</target>
-					</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -141,7 +137,6 @@
 					<encoding>${project.build.sourceEncoding}</encoding>
 					<inputEncoding>${project.build.sourceEncoding}</inputEncoding>
 					<outputEncoding>${project.build.sourceEncoding}</outputEncoding>
-					<!-- <argLine>-Dfile.encoding=${project.build.sourceEncoding} ${argLine}</argLine> -->
 				</configuration>
 			</plugin>
 			<plugin>
@@ -153,13 +148,6 @@
 					<forceCreation>true</forceCreation>
 					<skipIfEmpty>true</skipIfEmpty>
 				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>test-jar</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 			<plugin><!-- license:format -->
 				<groupId>com.mycila</groupId>
@@ -227,7 +215,6 @@
 								<id>attach-sources</id>
 								<goals>
 									<goal>jar</goal>
-									<goal>test-jar</goal>
 								</goals>
 							</execution>
 						</executions>
@@ -269,7 +256,7 @@
 					<plugin>
 						<groupId>org.owasp</groupId>
 						<artifactId>dependency-check-maven</artifactId>
-						<version>5.2.1</version>
+						<version>5.2.4</version>
 						<executions>
 							<execution>
 								<goals>
@@ -297,7 +284,4 @@
 			</distributionManagement>
 		</profile>
 	</profiles>
-
-	
-
 </project>

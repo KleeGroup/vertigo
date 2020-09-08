@@ -23,25 +23,7 @@
 	
 	<modules>
 		<module>vertigo-parent</module>
-		<module>vertigo-core</module>
-
-		<module>vertigo-commons-api</module>
-		<module>vertigo-commons-impl</module>
-		
-		<module>vertigo-database-api</module>
-		<module>vertigo-database-impl</module>
-
-		<module>vertigo-dynamo-api</module>
-		<module>vertigo-dynamo-impl</module>
-		<module>vertigo-dynamo-plugin-elasticsearch_5_6</module>
-		
-		<module>vertigo-account-api</module>
-		<module>vertigo-account-impl</module>
-
-		<module>vertigo-vega-api</module>
-		<module>vertigo-vega-impl</module>
-
-		<module>vertigo-studio</module>
+		<module>vertigo-core</module>		
 	</modules>
 
 	<scm>

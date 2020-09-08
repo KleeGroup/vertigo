@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +21,9 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Locale;
 
-import io.vertigo.app.Home;
-import io.vertigo.lang.Assertion;
-import io.vertigo.util.StringUtil;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.node.Node;
+import io.vertigo.core.util.StringUtil;
 
 /**
  * Texte pouvant être externalisé dans un fichier de ressources,
@@ -33,47 +32,13 @@ import io.vertigo.util.StringUtil;
  * @author npiedeloup, pchretien
  */
 public final class MessageText implements Serializable {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 4723023230514051954L;
 	/**Clé du libellé dans le dictionnaire. */
 	private final MessageKey key;
 	/**Libellé non formatté. */
 	private final String defaultMsg;
 	/**paramètres permettant de formatter le libellé. */
 	private final Serializable[] params;
-
-	/**
-	 * static Builder of a messageText by its key.
-	 * @param key Clé de la ressource
-	 * @return the messageText
-	 */
-	public static MessageText of(final MessageKey key, final Serializable... params) {
-		Assertion.checkNotNull(key, "the message key is required");
-		//---
-		return new MessageText(null, key, params);
-	}
-
-	/**
-	 * static Builder of a messageText by its default message.
-	 * @param msg Message par défaut (non formatté) de la ressource
-	 * @return the messageText
-	 */
-	public static MessageText of(final String msg, final Serializable... params) {
-		Assertion.checkArgNotEmpty(msg, "the message is required");
-		//---
-		return new MessageText(msg, null, params);
-	}
-
-	/**
-	 * static Builder of a messageText by its default message.
-	 * @param defaultMsg Message par défaut (non formatté) de la ressource
-	 * @return the messageText
-	 */
-	public static MessageText ofDefaultMsg(final String defaultMsg, final MessageKey key, final Serializable... params) {
-		Assertion.checkArgNotEmpty(defaultMsg, "the default message is required");
-		Assertion.checkNotNull(key, "the message key is required");
-		//---
-		return new MessageText(defaultMsg, key, params);
-	}
 
 	/**
 	 * Constructor.
@@ -84,8 +49,9 @@ public final class MessageText implements Serializable {
 	 * @param params paramètres de la ressource
 	 */
 	private MessageText(final String defaultMsg, final MessageKey key, final Serializable... params) {
-		Assertion.checkNotNull(params);
-		Assertion.checkArgument(defaultMsg != null || key != null, "key or msg must be defined");
+		Assertion.check()
+				.isNotNull(params)
+				.isTrue(defaultMsg != null || key != null, "key or msg must be defined");
 		//---
 		this.key = key;
 		this.defaultMsg = defaultMsg;
@@ -93,13 +59,38 @@ public final class MessageText implements Serializable {
 	}
 
 	/**
-	 * Constructor.
-	 *
+	 * static Builder of a messageText by its key.
 	 * @param key Clé de la ressource
-	 * @param params paramètres de la ressource
+	 * @return the messageText
 	 */
-	private MessageText(final MessageKey key, final Serializable... params) {
-		this(null, key, params);
+	public static MessageText of(final MessageKey key, final Serializable... params) {
+		Assertion.check().isNotNull(key, "the message key is required");
+		//---
+		return new MessageText(null, key, params);
+	}
+
+	/**
+	 * static Builder of a messageText by its default message.
+	 * @param msg Message par défaut (non formatté) de la ressource
+	 * @return the messageText
+	 */
+	public static MessageText of(final String msg, final Serializable... params) {
+		Assertion.check().isNotBlank(msg, "the message is required");
+		//---
+		return new MessageText(msg, null, params);
+	}
+
+	/**
+	 * static Builder of a messageText by its default message.
+	 * @param defaultMsg Message par défaut (non formatté) de la ressource
+	 * @return the messageText
+	 */
+	public static MessageText ofDefaultMsg(final String defaultMsg, final MessageKey key, final Serializable... params) {
+		Assertion.check()
+				.isNotBlank(defaultMsg, "the default message is required")
+				.isNotNull(key, "the message key is required");
+		//---
+		return new MessageText(defaultMsg, key, params);
 	}
 
 	/**
@@ -128,7 +119,7 @@ public final class MessageText implements Serializable {
 			try {
 				//Il est nécessaire que LocaleManager soit enregistré.
 				//Si pas d'utilisateur on prend la première langue déclarée.
-				localeManager = Home.getApp().getComponentSpace().resolve(LocaleManager.class);
+				localeManager = Node.getNode().getComponentSpace().resolve(LocaleManager.class);
 				locale = localeManager.getCurrentLocale();
 				msg = localeManager.getMessage(key, locale);
 			} catch (final Exception e) {

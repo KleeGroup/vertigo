@@ -1,0 +1,16 @@
+boot:
+  params: 
+    locales: fr_FR
+  plugins:
+    - io.vertigo.core.plugins.resource.classpath.ClassPathResourceResolverPlugin: {}
+    - io.vertigo.core.plugins.param.properties.PropertiesParamPlugin:
+        url: "${boot.testProperties}"
+modules:
+  io.vertigo.core.node.config.yaml.YamlBioFeatures:
+      features:
+        - bio:
+        - math: 
+            start: "${test.start}"
+      plugins:
+        - io.vertigo.core.node.component.data.SimpleMathPlugin: 
+            factor: "${test.factor}"

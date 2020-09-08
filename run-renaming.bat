@@ -1,1 +1,0 @@
-java -jar replace-1.0.0.jar replace-0.9.4-1.0.0.json

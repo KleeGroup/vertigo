@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,9 +28,10 @@ import javax.inject.Inject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import io.vertigo.AbstractTestCaseJU5;
-import io.vertigo.app.config.NodeConfig;
+import io.vertigo.core.AbstractTestCaseJU5;
 import io.vertigo.core.locale.data.CityGuide;
+import io.vertigo.core.node.config.BootConfig;
+import io.vertigo.core.node.config.NodeConfig;
 
 /**
  * @author pchretien
@@ -45,9 +45,9 @@ public final class LocaleManagerTest extends AbstractTestCaseJU5 {
 		//les locales doivent être séparées par des virgules
 		final String locales = "fr_FR, en , de_DE";
 		return NodeConfig.builder()
-				.beginBoot()
-				.withLocales(locales)
-				.endBoot()
+				.withBoot(BootConfig.builder()
+						.withLocales(locales)
+						.build())
 				.build();
 	}
 
@@ -58,7 +58,7 @@ public final class LocaleManagerTest extends AbstractTestCaseJU5 {
 
 	@Test
 	public void testDictionary() {
-		Assertions.assertThrows(IllegalStateException.class,
+		Assertions.assertThrows(IllegalArgumentException.class,
 				//On ne charge pas deux fois un dictionnaire
 				() -> localeManager.add("io.vertigo.core.locale.data.city-guide", CityGuide.values()));
 	}
@@ -92,7 +92,7 @@ public final class LocaleManagerTest extends AbstractTestCaseJU5 {
 
 	@Test
 	public void testLocaleProvider() {
-		localeManager.registerLocaleProvider(() -> Locale.GERMANY);
+		localeManager.registerLocaleSupplier(() -> Locale.GERMANY);
 		assertEquals(Locale.GERMANY, localeManager.getCurrentLocale());
 		final MessageText helloTxt = MessageText.of(CityGuide.HELLO);
 		assertEquals("guten tag", helloTxt.getDisplay());
@@ -101,14 +101,14 @@ public final class LocaleManagerTest extends AbstractTestCaseJU5 {
 
 	@Test
 	public void testUnknown() {
-		Assertions.assertThrows(IllegalArgumentException.class,
+		Assertions.assertThrows(IllegalStateException.class,
 				//On vérifie que l'on ne connait pas le japonais
 				() -> assertNull(localeManager.getMessage(CityGuide.HELLO, Locale.JAPANESE)));
 	}
 
 	@Test
 	public void testJapanese() {
-		localeManager.registerLocaleProvider(() -> Locale.JAPANESE);
+		localeManager.registerLocaleSupplier(() -> Locale.JAPANESE);
 		//On vérifie que l'on ne connait pas le japonais et que l'on retombe sur la langue par défaut
 		final MessageText helloTxt = MessageText.of(CityGuide.HELLO);
 		assertEquals("bonjour", helloTxt.getDisplay());

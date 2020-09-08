@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +17,8 @@
  */
 package io.vertigo.core.param.xml;
 
-import io.vertigo.app.config.NodeConfig;
+import io.vertigo.core.node.config.BootConfig;
+import io.vertigo.core.node.config.NodeConfig;
 import io.vertigo.core.param.AbstractParamManagerTest;
 import io.vertigo.core.param.Param;
 import io.vertigo.core.plugins.param.xml.XmlParamPlugin;
@@ -32,15 +32,13 @@ public final class XmlParamManagerTest extends AbstractParamManagerTest {
 	@Override
 	protected NodeConfig buildNodeConfig() {
 		final String locales = "fr_FR";
-		//@formatter:off
 		return NodeConfig.builder()
-			.beginBoot()
-				.withLocales(locales)
-				.addPlugin(ClassPathResourceResolverPlugin.class)
-				.addPlugin( XmlParamPlugin.class,
-						Param.of("url", "io/vertigo/core/param/xml/basic-app-config.xml"))
-			.endBoot()
-			.build();
-		// @formatter:on
+				.withBoot(BootConfig.builder()
+						.withLocales(locales)
+						.addPlugin(ClassPathResourceResolverPlugin.class)
+						.addPlugin(XmlParamPlugin.class,
+								Param.of("url", "io/vertigo/core/param/xml/basic-app-config.xml"))
+						.build())
+				.build();
 	}
 }

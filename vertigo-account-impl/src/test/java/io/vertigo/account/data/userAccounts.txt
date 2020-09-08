@@ -1,6 +1,0 @@
-john.doe	JTKirk		5NfIFw480cJ1RfnztJS_eSBboXqMapec91x04reDNTybgEr9QV_Kg= 	// Enterprise
-palmer.luckey	JPicard	_lElv_D20c_FqefCF7qq55RBWq23_bViVpRIxm4d9Q1JTvnJstaiA= 	// Picard
-bill.clinton	wone		Rs6JYWAx0cF_tE_76SRvCcEskeeZ6NYqBE-JYvuEbR5ZQgsW0C-Q4=	// wone
-phil.mormon		pmormon		Rs6JYWAx0cF_tE_76SRvCcEskeeZ6NYqBE-JYvuEbR5ZQgsW0C-Q4=	// wone
-jmeunier		jmeunier	Rs6JYWAx0cF_tE_76SRvCcEskeeZ6NYqBE-JYvuEbR5ZQgsW0C-Q4=	// wone
-admin			admin		5vIy0buT0cyhh7ODeWKEv5fvaWN1mdoNE_rmkCkjvhN8u05S_Et_Q=	// v3rt1g0	

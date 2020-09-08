@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +17,8 @@
  */
 package io.vertigo.core.param.multi;
 
-import io.vertigo.app.config.NodeConfig;
+import io.vertigo.core.node.config.BootConfig;
+import io.vertigo.core.node.config.NodeConfig;
 import io.vertigo.core.param.AbstractParamManagerTest;
 import io.vertigo.core.param.Param;
 import io.vertigo.core.plugins.param.properties.PropertiesParamPlugin;
@@ -35,18 +35,18 @@ public final class MultiParamManagerTest extends AbstractParamManagerTest {
 		final String locales = "fr_FR";
 
 		return NodeConfig.builder()
-				.beginBoot()
-				.withLocales(locales)
-				.addPlugin(ClassPathResourceResolverPlugin.class)
-				.addPlugin(XmlParamPlugin.class,
-						Param.of("url", "io/vertigo/core/param/multi/app-config.xml"))
-				.addPlugin(PropertiesParamPlugin.class,
-						Param.of("url", "io/vertigo/core/param/multi/app-config.properties"))
-				.addPlugin(PropertiesParamPlugin.class,
-						Param.of("url", "io/vertigo/core/param/multi/app-config2.properties"))
-				.addPlugin(XmlParamPlugin.class,
-						Param.of("url", "io/vertigo/core/param/multi/app-config2.xml"))
-				.endBoot()
+				.withBoot(BootConfig.builder()
+						.withLocales(locales)
+						.addPlugin(ClassPathResourceResolverPlugin.class)
+						.addPlugin(XmlParamPlugin.class,
+								Param.of("url", "io/vertigo/core/param/multi/app-config.xml"))
+						.addPlugin(PropertiesParamPlugin.class,
+								Param.of("url", "io/vertigo/core/param/multi/app-config.properties"))
+						.addPlugin(PropertiesParamPlugin.class,
+								Param.of("url", "io/vertigo/core/param/multi/app-config2.properties"))
+						.addPlugin(XmlParamPlugin.class,
+								Param.of("url", "io/vertigo/core/param/multi/app-config2.xml"))
+						.build())
 				.build();
 	}
 }

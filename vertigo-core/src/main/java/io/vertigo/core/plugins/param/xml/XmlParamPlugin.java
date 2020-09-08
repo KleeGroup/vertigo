@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,14 +31,14 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.SAXException;
 
+import io.vertigo.core.impl.param.ParamPlugin;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.lang.WrappedException;
 import io.vertigo.core.param.Param;
-import io.vertigo.core.param.ParamPlugin;
 import io.vertigo.core.param.ParamValue;
 import io.vertigo.core.resource.ResourceManager;
-import io.vertigo.lang.Assertion;
-import io.vertigo.lang.WrappedException;
-import io.vertigo.util.StringUtil;
-import io.vertigo.util.XmlUtil;
+import io.vertigo.core.util.StringUtil;
+import io.vertigo.core.util.XmlUtil;
 
 /**
  * Parser XML du paramétrage de la config.
@@ -55,8 +54,9 @@ public final class XmlParamPlugin implements ParamPlugin {
 	 */
 	@Inject
 	public XmlParamPlugin(final ResourceManager resourceManager, @ParamValue("url") final String url) {
-		Assertion.checkNotNull(resourceManager);
-		Assertion.checkArgNotEmpty(url);
+		Assertion.check()
+				.isNotNull(resourceManager)
+				.isNotBlank(url);
 		//-----
 		final URL configURL = resourceManager.resolve(url);
 		params = readXML(configURL);
@@ -65,7 +65,7 @@ public final class XmlParamPlugin implements ParamPlugin {
 	/** {@inheritDoc} */
 	@Override
 	public Optional<Param> getParam(final String paramName) {
-		Assertion.checkArgNotEmpty(paramName);
+		Assertion.check().isNotBlank(paramName);
 		//-----
 		return Optional.ofNullable(params.get(paramName));
 	}
@@ -74,7 +74,7 @@ public final class XmlParamPlugin implements ParamPlugin {
 	 * Charge une configuration, et complète celle existante.
 	 */
 	private static Map<String, Param> readXML(final URL configURL) {
-		Assertion.checkNotNull(configURL);
+		Assertion.check().isNotNull(configURL);
 		//-----
 		try {
 			return doReadXML(configURL);

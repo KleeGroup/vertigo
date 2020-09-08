@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<config>
-	<path name="math">
-	  	<param name="test.start" value="100"/>    	
-		<param name="test.toto" value="100"/>
-	</path>
-</config>

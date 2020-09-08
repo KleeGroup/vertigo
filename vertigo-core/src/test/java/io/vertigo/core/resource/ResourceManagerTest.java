@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +17,7 @@
  */
 package io.vertigo.core.resource;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.URL;
@@ -27,9 +27,12 @@ import javax.inject.Inject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import io.vertigo.AbstractTestCaseJU5;
-import io.vertigo.app.config.NodeConfig;
+import io.vertigo.core.AbstractTestCaseJU5;
+import io.vertigo.core.node.config.BootConfig;
+import io.vertigo.core.node.config.NodeConfig;
 import io.vertigo.core.plugins.resource.classpath.ClassPathResourceResolverPlugin;
+import io.vertigo.core.plugins.resource.local.LocalResourceResolverPlugin;
+import io.vertigo.core.plugins.resource.url.URLResourceResolverPlugin;
 
 /**
  * @author pchretien
@@ -41,14 +44,14 @@ public final class ResourceManagerTest extends AbstractTestCaseJU5 {
 
 	@Override
 	protected NodeConfig buildNodeConfig() {
-		//@formatter:off
 		return NodeConfig.builder()
-			.beginBoot()
-				.withLocales(locales)
-				.addPlugin(ClassPathResourceResolverPlugin.class)
-			.endBoot()
-			.build();
-		// @formatter:on
+				.withBoot(BootConfig.builder()
+						.withLocales(locales)
+						.addPlugin(LocalResourceResolverPlugin.class)
+						.addPlugin(URLResourceResolverPlugin.class)
+						.addPlugin(ClassPathResourceResolverPlugin.class)
+						.build())
+				.build();
 	}
 
 	@Test
@@ -65,9 +68,25 @@ public final class ResourceManagerTest extends AbstractTestCaseJU5 {
 	}
 
 	@Test
-	public void testResourceSelector() {
+	public void testClassPathResourceSelector() {
 		final String expected = "io/vertigo/core/resource/hello.properties";
 		final URL url = resourceManager.resolve(expected);
 		assertTrue(url.getPath().contains(expected));
+	}
+
+	@Test
+	public void testLocalResourceSelector() {
+		final String filePath = "src/test/java/io/vertigo/core/resource/hello.properties";
+		//final String espected = "file:" + filePath;
+		final URL url = resourceManager.resolve(filePath);
+		assertTrue(url.getPath().contains(filePath));
+	}
+
+	@Test
+	public void testURLResourceSelector() {
+		final String expectedPath = "/vertigo-io/vertigo";
+		final String expected = "https://github.com" + expectedPath;
+		final URL url = resourceManager.resolve(expected);
+		assertEquals(expectedPath, url.getPath());
 	}
 }

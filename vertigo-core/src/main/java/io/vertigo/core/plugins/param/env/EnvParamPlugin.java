@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +19,9 @@ package io.vertigo.core.plugins.param.env;
 
 import java.util.Optional;
 
+import io.vertigo.core.impl.param.ParamPlugin;
+import io.vertigo.core.lang.Assertion;
 import io.vertigo.core.param.Param;
-import io.vertigo.core.param.ParamPlugin;
-import io.vertigo.lang.Assertion;
 
 /**
  * Plugin de gestion de configuration des variables d'environnement.
@@ -33,7 +32,7 @@ public final class EnvParamPlugin implements ParamPlugin {
 	/** {@inheritDoc} */
 	@Override
 	public Optional<Param> getParam(final String paramName) {
-		Assertion.checkArgNotEmpty(paramName);
+		Assertion.check().isNotBlank(paramName);
 		//-----
 		final String paramValue = System.getenv().get(paramName);
 		return paramValue != null ? Optional.of(Param.of(paramName, paramValue)) : Optional.empty();

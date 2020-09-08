@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +21,7 @@ import java.time.ZoneId;
 import java.util.Locale;
 import java.util.function.Supplier;
 
-import io.vertigo.core.component.Manager;
+import io.vertigo.core.node.component.Manager;
 
 /**
  * Toute application gérée par kapser est multilingue ou plus précisémment multidictionnaires.
@@ -49,16 +48,16 @@ import io.vertigo.core.component.Manager;
  */
 public interface LocaleManager extends Manager {
 	/**
-	 * Enregistre une stratégie de choix de langue.
-	 * @param localeProvider Définit la langue par défaut de façon contextuelle
+	 * Register a strategy to choose a locale.
+	 * @param localeSupplier Supply a locale in a context
 	 */
-	void registerLocaleProvider(LocaleProvider localeProvider);
+	void registerLocaleSupplier(Supplier<Locale> localeSupplier);
 
 	/**
-	 * Enregistre une stratégie de choix de time zone.
-	 * @param zoneProvider Définit la time zone par défaut de façon contextuelle
+	 * Register a strategy to choose a zone.
+	 * @param zoneSupplier Supply a zone in a context
 	 */
-	void registerZoneProvider(Supplier<ZoneId> zoneProvider);
+	void registerZoneSupplier(Supplier<ZoneId> zoneSupplier);
 
 	/**
 	 * Ajout d'un dictionnaire de ressources.

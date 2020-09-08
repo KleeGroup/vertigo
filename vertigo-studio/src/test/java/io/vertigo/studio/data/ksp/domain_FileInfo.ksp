@@ -1,9 +1,0 @@
-package io.vertigo.studio.domain.fileinfo
-
-create FileInfo FiFileInfoStd {
-	storeName : "main"
-}
-
-create FileInfo FiFileInfoTemp {
-	storeName : "temp"
-}

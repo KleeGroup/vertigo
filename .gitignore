@@ -12,3 +12,5 @@ vertigo-bundle/src
 *.idea
 createSymLink.bat
 .metadata/*
+.factorypath
+.vscode/
