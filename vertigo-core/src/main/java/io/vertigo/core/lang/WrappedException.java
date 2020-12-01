@@ -48,7 +48,9 @@ public final class WrappedException extends RuntimeException {
 	 * @return RuntimeException runtime
 	 */
 	public static RuntimeException wrap(final Throwable th) {
-		return wrap(th, th.getMessage());
+		//WrapException are use to wrap unkowned exception the message can be null.
+		//But we check a dev's exception have got a message, so in this api (with just th) we send "null" if message is null
+		return wrap(th, String.valueOf(th.getMessage()));
 	}
 
 	/**

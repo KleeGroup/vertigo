@@ -30,6 +30,7 @@ import io.vertigo.core.lang.Assertion;
 import io.vertigo.core.param.Param;
 import io.vertigo.core.param.ParamValue;
 import io.vertigo.core.resource.ResourceManager;
+import io.vertigo.core.util.FileUtil;
 
 /**
  * Plugin de gestion de configuration de fichiers properties.
@@ -52,7 +53,7 @@ public final class PropertiesParamPlugin implements ParamPlugin {
 				.isNotNull(resourceManager)
 				.isNotBlank(url);
 		//-----
-		final URL configURL = resourceManager.resolve(url);
+		final URL configURL = resourceManager.resolve(FileUtil.translatePath(url));
 		properties = loadProperties(configURL);
 	}
 

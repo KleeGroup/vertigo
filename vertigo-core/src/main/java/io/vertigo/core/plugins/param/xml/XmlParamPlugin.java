@@ -37,6 +37,7 @@ import io.vertigo.core.lang.WrappedException;
 import io.vertigo.core.param.Param;
 import io.vertigo.core.param.ParamValue;
 import io.vertigo.core.resource.ResourceManager;
+import io.vertigo.core.util.FileUtil;
 import io.vertigo.core.util.StringUtil;
 import io.vertigo.core.util.XmlUtil;
 
@@ -58,7 +59,7 @@ public final class XmlParamPlugin implements ParamPlugin {
 				.isNotNull(resourceManager)
 				.isNotBlank(url);
 		//-----
-		final URL configURL = resourceManager.resolve(url);
+		final URL configURL = resourceManager.resolve(FileUtil.translatePath(url));
 		params = readXML(configURL);
 	}
 

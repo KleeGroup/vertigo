@@ -4,7 +4,7 @@
 
 	<groupId>io.vertigo</groupId>
 	<artifactId>vertigo-parent</artifactId>
-	<version>3.0.0-SNAPSHOT</version>
+	<version>3.1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>vertigo-parent</name>
 	<description>Vertigo is a simple java project starter</description>
@@ -62,7 +62,7 @@
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<vertigo.version>3.0.0-RC</vertigo.version>
+		<vertigo.version>3.0.0</vertigo.version>
 
 		<!-- For global junit test coverage -->
 		<jacoco.destFile>${project.basedir}/../target/jacoco-it.exec</jacoco.destFile>
@@ -73,13 +73,13 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
-			<version>5.6.2</version>
+			<version>5.7.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
-			<version>5.6.2</version>
+			<version>5.7.0</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -182,7 +182,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.1.1</version>
+				<version>3.2.0</version>
 				<configuration>
 					<doclint>none</doclint>
 				</configuration>
